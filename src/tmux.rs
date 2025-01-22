@@ -1,4 +1,4 @@
-use std::{process::Command, str::from_utf8};
+use std::{env, os::unix::process::CommandExt, process::Command, str::from_utf8};
 
 use chrono::{DateTime, Local};
 
@@ -61,4 +61,29 @@ pub fn list_sessions() -> Result<Vec<Session>, &'static str> {
         .collect();
 
     lines
+}
+
+pub fn open_session(session: &Session) -> Result<(), &str> {
+    if in_session() {
+        let output = Command::new("tmux")
+            .args(["switch", "-t", &session.name])
+            .output();
+
+        match output {
+            Ok(output) => output,
+            Err(_) => return Err("cannot open tmux session"),
+        };
+    } else {
+        let err = Command::new("tmux")
+            .args(["attach", "-t", &session.name])
+            .exec();
+
+        println!("{err}");
+    }
+
+    Ok(())
+}
+
+pub fn in_session() -> bool {
+    env::var("TERM_PROGRAM").unwrap() == "tmux"
 }
