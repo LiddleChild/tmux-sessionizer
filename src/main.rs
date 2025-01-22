@@ -41,16 +41,7 @@ fn main() {
         execute!(stdout(), MoveToRow(0), Clear(ClearType::All)).unwrap();
 
         for (i, session) in sessions.iter().enumerate() {
-            let mut content = format!(
-                "{} (created at {}) {}",
-                session.name,
-                session.created_at,
-                if session.is_attached {
-                    "(attached)"
-                } else {
-                    ""
-                }
-            );
+            let mut content = session.to_string();
 
             if session.is_attached {
                 content = format!("{}{content}{}", Attribute::Bold, Attribute::Reset);

@@ -1,4 +1,4 @@
-use std::{env, os::unix::process::CommandExt, process::Command, str::from_utf8};
+use std::{env, fmt::Display, os::unix::process::CommandExt, process::Command, str::from_utf8};
 
 use chrono::{DateTime, Local};
 
@@ -9,6 +9,18 @@ pub struct Session {
     pub name: String,
     pub created_at: DateTime<Local>,
     pub is_attached: bool,
+}
+
+impl Display for Session {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} (created at {}) {}",
+            self.name,
+            self.created_at,
+            if self.is_attached { "(attached)" } else { "" }
+        )
+    }
 }
 
 impl Session {
