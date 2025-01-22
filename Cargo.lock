@@ -322,7 +322,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tmux-session-pane"
+name = "tmux-sessionizer"
 version = "0.1.0"
 dependencies = [
  "chrono",

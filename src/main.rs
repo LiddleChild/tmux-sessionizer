@@ -6,7 +6,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use tmux_session_pane::{
+use tmux_sessionizer::{
     session_pane::SessionPane,
     tmux::{list_sessions, open_session},
 };
