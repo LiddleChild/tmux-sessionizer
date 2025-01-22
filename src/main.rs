@@ -32,7 +32,13 @@ fn main() {
         }
     };
 
-    let mut session_pane = SessionPane::new(sessions);
+    let current_session = sessions
+        .iter()
+        .enumerate()
+        .find_map(|(i, s)| if s.is_attached { Some(i) } else { None })
+        .unwrap_or(0);
+
+    let mut session_pane = SessionPane::new(sessions, current_session);
 
     'event_loop: loop {
         session_pane.render();

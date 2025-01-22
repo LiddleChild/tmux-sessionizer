@@ -15,10 +15,10 @@ pub struct SessionPane {
 }
 
 impl SessionPane {
-    pub fn new(sessions: Vec<Session>) -> Self {
+    pub fn new(sessions: Vec<Session>, selection: usize) -> Self {
         Self {
             sessions,
-            selection: 0,
+            selection,
         }
     }
 
