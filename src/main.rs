@@ -46,8 +46,8 @@ fn main() {
         if let Event::Key(key) = event::read().unwrap() {
             match key.code {
                 KeyCode::Char('q') | KeyCode::Esc => break 'event_loop,
-                KeyCode::Up | KeyCode::Char('j') => session_pane.select_next(),
-                KeyCode::Down | KeyCode::Char('k') => session_pane.select_prev(),
+                KeyCode::Up | KeyCode::Char('k') => session_pane.select_prev(),
+                KeyCode::Down | KeyCode::Char('j') => session_pane.select_next(),
                 KeyCode::Enter => {
                     disable_raw_mode().unwrap();
                     open_session(session_pane.get_current_session()).unwrap();
