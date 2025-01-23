@@ -8,7 +8,7 @@ use crossterm::{
 };
 use tmux_sessionizer::{
     session_pane::SessionPane,
-    tmux::{list_sessions, open_session},
+    tmux::{list_sessions, new_session, open_session},
 };
 
 fn start_raw_mode() {
@@ -45,14 +45,29 @@ fn main() {
 
         if let Event::Key(key) = event::read().unwrap() {
             match key.code {
-                KeyCode::Char('q') | KeyCode::Esc => break 'event_loop,
+                KeyCode::Esc | KeyCode::Char('q') => break 'event_loop,
                 KeyCode::Up | KeyCode::Char('k') => session_pane.select_prev(),
                 KeyCode::Down | KeyCode::Char('j') => session_pane.select_next(),
-                KeyCode::Enter => {
-                    disable_raw_mode().unwrap();
-                    open_session(session_pane.get_current_session()).unwrap();
-                    break 'event_loop;
-                }
+                KeyCode::Enter => match session_pane.get_current_session() {
+                    Some(session) => {
+                        disable_raw_mode().unwrap();
+                        open_session(session).unwrap();
+                        break 'event_loop;
+                    }
+                    None => {
+                        new_session();
+                        match list_sessions().unwrap().last() {
+                            Some(session) => {
+                                disable_raw_mode().unwrap();
+                                open_session(session).unwrap();
+                                break 'event_loop;
+                            }
+                            None => {
+                                eprintln!("error creating new session");
+                            }
+                        }
+                    }
+                },
                 _ => {}
             }
         }

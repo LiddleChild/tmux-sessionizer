@@ -1,4 +1,4 @@
-use std::{env, fmt::Display, os::unix::process::CommandExt, process::Command, str::from_utf8};
+use std::{env, fmt::Display, process::Command, str::from_utf8};
 
 use chrono::{DateTime, Local};
 
@@ -72,25 +72,24 @@ pub fn list_sessions() -> Result<Vec<Session>, &'static str> {
         .map(|line| Session::new_from_string(line))
         .collect();
 
-    lines
+    match lines {
+        Ok(mut lines) => {
+            lines.sort_by(|a, b| a.created_at.cmp(&b.created_at));
+            Ok(lines)
+        }
+        Err(err) => Err(err),
+    }
 }
 
 pub fn open_session(session: &Session) -> Result<(), &str> {
     if in_session() {
-        let output = Command::new("tmux")
+        let _ = Command::new("tmux")
             .args(["switch", "-t", &session.name])
             .output();
-
-        match output {
-            Ok(output) => output,
-            Err(_) => return Err("cannot open tmux session"),
-        };
     } else {
-        let err = Command::new("tmux")
+        let _ = Command::new("tmux")
             .args(["attach", "-t", &session.name])
-            .exec();
-
-        println!("{err}");
+            .output();
     }
 
     Ok(())
@@ -98,4 +97,8 @@ pub fn open_session(session: &Session) -> Result<(), &str> {
 
 pub fn in_session() -> bool {
     env::var("TERM_PROGRAM").unwrap() == "tmux"
+}
+
+pub fn new_session() {
+    let _ = Command::new("tmux").args(["new-session", "-d"]).output();
 }
