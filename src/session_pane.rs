@@ -91,10 +91,14 @@ impl SessionPane {
     }
 
     pub fn pop_selected_session(&mut self) -> Option<Session> {
-        let session = self.items.remove(self.selection).session;
+        if self.items[self.selection].session.is_some() {
+            let session = self.items.remove(self.selection).session;
 
-        self.selection = self.selection.min(0).max(self.items.len() - 1);
+            self.selection = self.selection.min(0).max(self.items.len() - 1);
 
-        session
+            return session;
+        }
+
+        None
     }
 }
