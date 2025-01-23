@@ -86,7 +86,15 @@ impl SessionPane {
         }
     }
 
-    pub fn get_current_session(&self) -> Option<&Session> {
+    pub fn get_selected_session(&self) -> Option<&Session> {
         self.items[self.selection].session.as_ref()
+    }
+
+    pub fn pop_selected_session(&mut self) -> Option<Session> {
+        let session = self.items.remove(self.selection).session;
+
+        self.selection = self.selection.min(0).max(self.items.len() - 1);
+
+        session
     }
 }

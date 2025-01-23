@@ -102,3 +102,9 @@ pub fn in_session() -> bool {
 pub fn new_session() {
     let _ = Command::new("tmux").args(["new-session", "-d"]).output();
 }
+
+pub fn kill_session(session: &Session) {
+    let _ = Command::new("tmux")
+        .args(["kill-session", "-t", &session.name])
+        .output();
+}

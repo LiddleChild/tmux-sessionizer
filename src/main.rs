@@ -8,7 +8,7 @@ use crossterm::{
 };
 use tmux_sessionizer::{
     session_pane::SessionPane,
-    tmux::{list_sessions, new_session, open_session},
+    tmux::{kill_session, list_sessions, new_session, open_session},
 };
 
 fn start_raw_mode() {
@@ -48,7 +48,7 @@ fn main() {
                 KeyCode::Esc | KeyCode::Char('q') => break 'event_loop,
                 KeyCode::Up | KeyCode::Char('k') => session_pane.select_prev(),
                 KeyCode::Down | KeyCode::Char('j') => session_pane.select_next(),
-                KeyCode::Enter => match session_pane.get_current_session() {
+                KeyCode::Enter => match session_pane.get_selected_session() {
                     Some(session) => {
                         disable_raw_mode().unwrap();
                         open_session(session).unwrap();
@@ -68,6 +68,11 @@ fn main() {
                         }
                     }
                 },
+                KeyCode::Char('d') => {
+                    if let Some(session) = session_pane.pop_selected_session() {
+                        kill_session(&session);
+                    }
+                }
                 _ => {}
             }
         }
