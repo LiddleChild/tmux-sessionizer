@@ -1,4 +1,4 @@
-use std::{env, fmt::Display, process::Command, str::from_utf8};
+use std::{env, fmt::Display, os::unix::process::CommandExt, process::Command, str::from_utf8};
 
 use chrono::{DateTime, Local};
 
@@ -85,11 +85,11 @@ pub fn open_session(session: &Session) -> Result<(), &str> {
     if in_session() {
         let _ = Command::new("tmux")
             .args(["switch", "-t", &session.name])
-            .output();
+            .exec();
     } else {
         let _ = Command::new("tmux")
             .args(["attach", "-t", &session.name])
-            .output();
+            .exec();
     }
 
     Ok(())
