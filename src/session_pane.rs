@@ -7,7 +7,11 @@ use crossterm::{
     terminal::{window_size, Clear, ClearType},
 };
 
-use crate::tmux::Session;
+use crate::{tmux::Session, VERSION};
+
+const QUICK_HELP: &'static str = r"
+Quick help   ↑ k: up   ↓ j: down   ENTER: select   d: delete
+";
 
 struct SessionPaneItem {
     name: String,
@@ -38,13 +42,35 @@ impl SessionPane {
     }
 
     pub fn render(&self) {
+        let col = window_size().unwrap().columns as usize;
+
         execute!(stdout(), MoveToRow(0), Clear(ClearType::All)).unwrap();
+
+        let seperator = "=".repeat(col);
+
+        print!("{}", seperator);
+        execute!(stdout(), MoveToNextLine(1)).unwrap();
+
+        print!(
+            "{}tmux-sessionizer{} {}",
+            Attribute::Bold,
+            Attribute::Reset,
+            VERSION
+        );
+        execute!(stdout(), MoveToNextLine(1)).unwrap();
+
+        String::from(QUICK_HELP).trim().lines().for_each(|line| {
+            print!("{line}");
+            execute!(stdout(), MoveToNextLine(1)).unwrap();
+        });
+
+        print!("{}", seperator);
+        execute!(stdout(), MoveToNextLine(2)).unwrap();
 
         for (i, item) in self.items.iter().enumerate() {
             let mut content = item.name.clone();
 
-            let col = window_size().unwrap().columns;
-            let space = " ".repeat(col as usize - content.len());
+            let space = " ".repeat(col - content.len());
 
             if let Some(session) = &item.session {
                 if session.is_attached {
