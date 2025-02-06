@@ -108,3 +108,21 @@ pub fn kill_session(session: &Session) {
         .args(["kill-session", "-t", &session.name])
         .output();
 }
+
+pub fn rename_session(old_name: &String, name: &String) -> Result<bool, &'static str> {
+    let output = Command::new("tmux")
+        .args(["rename-session", "-t", old_name, name])
+        .output();
+
+    let output = match output {
+        Ok(output) => output,
+        Err(_) => return Err("cannot list tmux sessions"),
+    };
+
+    let stderr = match from_utf8(&output.stderr) {
+        Ok(stderr) => stderr,
+        Err(_) => return Err("cannot read stderr"),
+    };
+
+    Ok(stderr.trim().len() == 0)
+}

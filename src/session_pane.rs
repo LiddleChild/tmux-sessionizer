@@ -21,6 +21,7 @@ struct SessionPaneItem {
 pub struct SessionPane {
     items: Vec<SessionPaneItem>,
     selection: usize,
+    selection_row: u16,
 }
 
 impl SessionPane {
@@ -38,18 +39,39 @@ impl SessionPane {
             session: None,
         });
 
-        Self { items, selection }
+        Self {
+            items,
+            selection,
+            selection_row: 0,
+        }
     }
 
-    pub fn render(&self) {
+    fn move_to_row(&self, current_row: &mut u16, row: u16) -> MoveToRow {
+        *current_row = row;
+        MoveToRow(row)
+    }
+
+    fn move_to_next_line(&self, current_row: &mut u16, line: u16) -> MoveToNextLine {
+        *current_row += line;
+        MoveToNextLine(line)
+    }
+
+    pub fn render(&mut self) {
+        let mut current_row = 0;
+
         let col = window_size().unwrap().columns as usize;
 
-        execute!(stdout(), MoveToRow(0), Clear(ClearType::All)).unwrap();
+        execute!(
+            stdout(),
+            self.move_to_row(&mut current_row, 0),
+            Clear(ClearType::All)
+        )
+        .unwrap();
 
         let seperator = "=".repeat(col);
 
         print!("{}", seperator);
-        execute!(stdout(), MoveToNextLine(1)).unwrap();
+        execute!(stdout(), self.move_to_next_line(&mut current_row, 1)).unwrap();
 
         print!(
             "{}tmux-sessionizer{} {}",
@@ -57,15 +79,15 @@ impl SessionPane {
             Attribute::Reset,
             VERSION
         );
-        execute!(stdout(), MoveToNextLine(1)).unwrap();
+        execute!(stdout(), self.move_to_next_line(&mut current_row, 1)).unwrap();
 
         String::from(QUICK_HELP).trim().lines().for_each(|line| {
             print!("{line}");
-            execute!(stdout(), MoveToNextLine(1)).unwrap();
+            execute!(stdout(), self.move_to_next_line(&mut current_row, 1)).unwrap();
         });
 
         print!("{}", seperator);
-        execute!(stdout(), MoveToNextLine(2)).unwrap();
+        execute!(stdout(), self.move_to_next_line(&mut current_row, 2)).unwrap();
 
         for (i, item) in self.items.iter().enumerate() {
             let mut content = item.name.clone();
@@ -74,11 +96,11 @@ impl SessionPane {
 
             if let Some(session) = &item.session {
                 if session.is_attached {
-                    content = format!("{}{}", Attribute::Bold, item.name);
+                    content = format!("{}{}", Attribute::Bold, content);
                 }
             } else {
                 execute!(stdout(), SetForegroundColor(Color::Grey)).unwrap();
-                content = format!("{}{}", Attribute::Italic, item.name);
+                content = format!("{}{}", Attribute::Italic, content);
             }
 
             if self.selection == i {
@@ -89,10 +111,17 @@ impl SessionPane {
                     SetBackgroundColor(Color::DarkGrey),
                 )
                 .unwrap();
+
+                self.selection_row = current_row;
             }
 
             print!("{}{}", content, space);
-            execute!(stdout(), MoveToNextLine(1), ResetColor).unwrap();
+            execute!(
+                stdout(),
+                self.move_to_next_line(&mut current_row, 1),
+                ResetColor
+            )
+            .unwrap();
         }
     }
 
@@ -112,6 +141,10 @@ impl SessionPane {
         }
     }
 
+    pub fn get_selected_row(&self) -> u16 {
+        self.selection_row
+    }
+
     pub fn get_selected_session(&self) -> Option<&Session> {
         self.items[self.selection].session.as_ref()
     }
@@ -126,5 +159,14 @@ impl SessionPane {
         }
 
         None
+    }
+
+    pub fn rename_selected_session(&mut self, name: &String) {
+        let item = &mut self.items[self.selection];
+
+        if let Some(session) = item.session.as_mut() {
+            session.name = name.clone();
+            item.name = session.to_string();
+        }
     }
 }
