@@ -10,7 +10,7 @@ use crossterm::{
 use crate::{tmux::Session, VERSION};
 
 const QUICK_HELP: &'static str = r"
-Quick help   ↑ k: up   ↓ j: down   ENTER: select   d: delete
+Quick help   ↑ k: up   ↓ j: down   ENTER: select   d: delete   r: rename session
 ";
 
 struct SessionPaneItem {
@@ -22,6 +22,7 @@ pub struct SessionPane {
     items: Vec<SessionPaneItem>,
     selection: usize,
     selection_row: u16,
+    current_row: u16,
 }
 
 impl SessionPane {
@@ -43,35 +44,29 @@ impl SessionPane {
             items,
             selection,
             selection_row: 0,
+            current_row: 0,
         }
     }
 
-    fn move_to_row(&self, current_row: &mut u16, row: u16) -> MoveToRow {
-        *current_row = row;
+    fn move_to_row(&mut self, row: u16) -> MoveToRow {
+        self.current_row = row;
         MoveToRow(row)
     }
 
-    fn move_to_next_line(&self, current_row: &mut u16, line: u16) -> MoveToNextLine {
-        *current_row += line;
+    fn move_to_next_line(&mut self, line: u16) -> MoveToNextLine {
+        self.current_row += line;
         MoveToNextLine(line)
     }
 
     pub fn render(&mut self) {
-        let mut current_row = 0;
-
         let col = window_size().unwrap().columns as usize;
 
-        execute!(
-            stdout(),
-            self.move_to_row(&mut current_row, 0),
-            Clear(ClearType::All)
-        )
-        .unwrap();
+        execute!(stdout(), self.move_to_row(0), Clear(ClearType::All)).unwrap();
 
         let seperator = "=".repeat(col);
 
         print!("{}", seperator);
-        execute!(stdout(), self.move_to_next_line(&mut current_row, 1)).unwrap();
+        execute!(stdout(), self.move_to_next_line(1)).unwrap();
 
         print!(
             "{}tmux-sessionizer{} {}",
@@ -79,17 +74,19 @@ impl SessionPane {
             Attribute::Reset,
             VERSION
         );
-        execute!(stdout(), self.move_to_next_line(&mut current_row, 1)).unwrap();
+        execute!(stdout(), self.move_to_next_line(1)).unwrap();
 
         String::from(QUICK_HELP).trim().lines().for_each(|line| {
             print!("{line}");
-            execute!(stdout(), self.move_to_next_line(&mut current_row, 1)).unwrap();
+            execute!(stdout(), self.move_to_next_line(1)).unwrap();
         });
 
         print!("{}", seperator);
-        execute!(stdout(), self.move_to_next_line(&mut current_row, 2)).unwrap();
+        execute!(stdout(), self.move_to_next_line(2)).unwrap();
 
-        for (i, item) in self.items.iter().enumerate() {
+        for i in 0..self.items.len() {
+            let item = &self.items[i];
+
             let mut content = item.name.clone();
 
             let space = " ".repeat(col - content.len());
@@ -112,16 +109,11 @@ impl SessionPane {
                 )
                 .unwrap();
 
-                self.selection_row = current_row;
+                self.selection_row = self.current_row;
             }
 
             print!("{}{}", content, space);
-            execute!(
-                stdout(),
-                self.move_to_next_line(&mut current_row, 1),
-                ResetColor
-            )
-            .unwrap();
+            execute!(stdout(), self.move_to_next_line(1), ResetColor).unwrap();
         }
     }
 
