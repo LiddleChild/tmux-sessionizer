@@ -1,13 +1,6 @@
-use std::io::stdout;
+use crossterm::style::{Attribute, Color};
 
-use crossterm::{
-    cursor::{MoveToNextLine, MoveToRow},
-    execute,
-    style::{Attribute, Color, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal::{window_size, Clear, ClearType},
-};
-
-use crate::{tmux::Session, VERSION};
+use crate::{renderer::Renderer, tmux::Session, VERSION};
 
 const QUICK_HELP: &'static str = r"
 Quick help   ↑ k: up   ↓ j: down   ENTER: select   d: delete   r: rename session
@@ -22,7 +15,6 @@ pub struct SessionPane {
     items: Vec<SessionPaneItem>,
     selection: usize,
     selection_row: u16,
-    current_row: u16,
 }
 
 impl SessionPane {
@@ -44,76 +36,55 @@ impl SessionPane {
             items,
             selection,
             selection_row: 0,
-            current_row: 0,
         }
     }
 
-    fn move_to_row(&mut self, row: u16) -> MoveToRow {
-        self.current_row = row;
-        MoveToRow(row)
-    }
-
-    fn move_to_next_line(&mut self, line: u16) -> MoveToNextLine {
-        self.current_row += line;
-        MoveToNextLine(line)
-    }
-
-    pub fn render(&mut self) {
-        let col = window_size().unwrap().columns as usize;
-
-        execute!(stdout(), self.move_to_row(0), Clear(ClearType::All)).unwrap();
-
+    pub fn render(&mut self, renderer: &mut Renderer) {
+        let col = renderer.term_size().0 as usize;
         let seperator = "=".repeat(col);
 
-        print!("{}", seperator);
-        execute!(stdout(), self.move_to_next_line(1)).unwrap();
+        renderer.println(&seperator);
 
-        print!(
+        renderer.println(&format!(
             "{}tmux-sessionizer{} {}",
             Attribute::Bold,
             Attribute::Reset,
             VERSION
-        );
-        execute!(stdout(), self.move_to_next_line(1)).unwrap();
+        ));
 
         String::from(QUICK_HELP).trim().lines().for_each(|line| {
-            print!("{line}");
-            execute!(stdout(), self.move_to_next_line(1)).unwrap();
+            renderer.println(line);
         });
 
-        print!("{}", seperator);
-        execute!(stdout(), self.move_to_next_line(2)).unwrap();
+        renderer.println(&seperator).move_to_next_line(1);
 
         for i in 0..self.items.len() {
             let item = &self.items[i];
-
-            let mut content = item.name.clone();
-
-            let space = " ".repeat(col - content.len());
+            let content = &item.name;
 
             if let Some(session) = &item.session {
                 if session.is_attached {
-                    content = format!("{}{}", Attribute::Bold, content);
+                    renderer.set_attribute(Attribute::Bold);
                 }
             } else {
-                execute!(stdout(), SetForegroundColor(Color::Grey)).unwrap();
-                content = format!("{}{}", Attribute::Italic, content);
+                renderer
+                    .set_foreground_color(Color::Grey)
+                    .set_attribute(Attribute::Italic);
             }
 
             if self.selection == i {
-                print!("{}", Attribute::Bold);
-                execute!(
-                    stdout(),
-                    SetForegroundColor(Color::Magenta),
-                    SetBackgroundColor(Color::DarkGrey),
-                )
-                .unwrap();
+                renderer
+                    .set_attribute(Attribute::Bold)
+                    .set_foreground_color(Color::Magenta)
+                    .set_background_color(Color::DarkGrey);
 
-                self.selection_row = self.current_row;
+                self.selection_row = renderer.current_position().1;
             }
 
-            print!("{}{}", content, space);
-            execute!(stdout(), self.move_to_next_line(1), ResetColor).unwrap();
+            let space = " ".repeat(col - content.len());
+            renderer
+                .println(&format!("{}{}", content, space))
+                .set_attribute(Attribute::Reset);
         }
     }
 

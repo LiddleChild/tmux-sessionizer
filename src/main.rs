@@ -1,12 +1,13 @@
 use std::{io::stdout, process::exit};
 
 use crossterm::{
-    cursor::{Hide, MoveLeft, MoveRight, MoveToColumn, MoveToRow, Show},
+    cursor::{Hide, Show},
     event::{self, Event, KeyCode},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use tmux_sessionizer::{
+    renderer::Renderer,
     session_pane::SessionPane,
     tmux::{kill_session, list_sessions, new_session, open_session, rename_session},
 };
@@ -44,21 +45,20 @@ fn main() {
     let mut input = String::new();
     let mut input_mode = false;
 
-    'event_loop: loop {
-        execute!(stdout(), MoveToColumn(0), MoveToRow(0)).unwrap();
+    let mut renderer = Renderer::new();
 
-        session_pane.render();
+    'event_loop: loop {
+        renderer.clear_term();
+
+        session_pane.render(&mut renderer);
 
         if input_mode {
-            execute!(
-                stdout(),
-                Show,
-                MoveToRow(session_pane.get_selected_row()),
-                MoveToColumn(input.len() as u16)
-            )
-            .unwrap();
+            renderer
+                .show_cursor()
+                .move_to_row(session_pane.get_selected_row())
+                .move_to_col(input.len() as u16);
         } else {
-            execute!(stdout(), Hide).unwrap();
+            renderer.hide_cursor();
         }
 
         if let Event::Key(key) = event::read().unwrap() {
@@ -66,12 +66,10 @@ fn main() {
                 KeyCode::Char(c) if input_mode => {
                     input.push(c);
                     session_pane.rename_selected_session(&input);
-                    execute!(stdout(), MoveRight(1)).unwrap();
                 }
                 KeyCode::Backspace if input_mode => {
                     input.pop();
                     session_pane.rename_selected_session(&input);
-                    execute!(stdout(), MoveLeft(1)).unwrap();
                 }
                 KeyCode::Esc if input_mode => {
                     input_mode = false;
