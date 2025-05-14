@@ -322,8 +322,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tmux-sessionizer"
-version = "0.1.0"
+name = "tmux-sessionpane"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "crossterm",

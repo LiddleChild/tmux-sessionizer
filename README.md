@@ -1,4 +1,4 @@
-# tmux-sessionizer
+# tmux-sessionpane
 
 ### Installation
 
@@ -12,5 +12,5 @@ cargo install --path .
 3. Put key binding in `tmux.conf`
 
 ```
-bind 'S' new-window "which tmux-sessionizer 2>&1 > /dev/null && tmux-sessionizer || { echo 'tmux-sessionizer does not exist\n' ; read -s -k '?Press any key to continue...' }"
+bind 'S' new-window "which tmux-sessionpane 2>&1 > /dev/null && tmux-sessionpane || { echo 'tmux-sessionpane does not exist\n' ; read -s -k '?Press any key to continue...' }"
 ```

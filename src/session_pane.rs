@@ -46,7 +46,7 @@ impl SessionPane {
         renderer.println(&seperator);
 
         renderer.println(&format!(
-            "{}tmux-sessionizer{} {}",
+            "{}tmux-sessionpane{} {}",
             Attribute::Bold,
             Attribute::Reset,
             VERSION
