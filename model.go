@@ -90,25 +90,26 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.list.SetWidth(msg.Width)
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter":
 			session := m.list.SelectedItem().(item)
-			return m, AttachSession(session.Name)
+
+			execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Name), func(err error) tea.Msg {
+				return QuitWithErr(err)
+			})
+
+			return m, tea.Sequence(
+				execProcessCmd,
+				tea.Quit,
+			)
 		}
 
-	case tea.WindowSizeMsg:
-		m.list.SetWidth(msg.Width)
-
-	case AttachSessionMsg:
-		if err := m.program.ReleaseTerminal(); err != nil {
-			m.err = err
-		}
-
-		if err := tmux.AttachSession(msg.Name); err != nil {
-			m.err = err
-		}
-
+	case QuitWithErrMsg:
+		m.err = msg.err
 		return m, tea.Quit
 	}
 
@@ -121,7 +122,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var builder strings.Builder
 
-	builder.WriteString(fmt.Sprintf("tmux-sessionpane %s", Version))
+	builder.WriteString(fmt.Sprintf("%s %s", AppName, Version))
 	builder.WriteByte('\n')
 	builder.WriteString(m.list.Help.View(m.list))
 	builder.WriteByte('\n')

@@ -2,12 +2,12 @@ package main
 
 import tea "github.com/charmbracelet/bubbletea"
 
-type AttachSessionMsg struct {
-	Name string
+type QuitWithErrMsg struct {
+	err error
 }
 
-func AttachSession(name string) tea.Cmd {
+func QuitWithErr(err error) tea.Cmd {
 	return func() tea.Msg {
-		return AttachSessionMsg{Name: name}
+		return QuitWithErrMsg{err: err}
 	}
 }

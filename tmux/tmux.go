@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"slices"
-	"syscall"
 	"time"
 )
 
@@ -54,20 +53,12 @@ func ListSession() ([]Session, error) {
 	return sessions, nil
 }
 
-func AttachSession(name string) error {
-	tmux, err := exec.LookPath("tmux")
-	if err != nil {
-		return err
-	}
-
-	var args []string
+func AttachSessionCommand(name string) *exec.Cmd {
 	if !InTmux() {
-		args = []string{tmux, "attach-session", "-t", name}
+		return exec.Command("tmux", "attach-session", "-t", name)
 	} else {
-		args = []string{tmux, "switch-client", "-t", name}
+		return exec.Command("tmux", "switch-client", "-t", name)
 	}
-
-	return syscall.Exec(tmux, args, os.Environ())
 }
 
 // new session
