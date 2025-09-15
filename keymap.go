@@ -35,4 +35,8 @@ var keymap = keyMap{
 		key.WithKeys("q", "esc", "ctrl+c"),
 		key.WithHelp("q / esc / ctrl+c", "quit"),
 	),
+	Select: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "select"),
+	),
 }
