@@ -58,8 +58,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 var _ tea.Model = (*model)(nil)
 
 type model struct {
-	program *tea.Program
-	err     error
+	err error
 
 	list list.Model
 }
@@ -75,13 +74,17 @@ func NewModel() (*model, error) {
 		items = append(items, item(session))
 	}
 
-	l := list.New(items, itemDelegate{}, 0, len(sessions)+2)
+	l := list.New(items, itemDelegate{}, 0, len(sessions))
 	l.SetFilteringEnabled(false)
 	l.SetShowStatusBar(false)
 	l.SetShowTitle(false)
 	l.SetShowHelp(false)
+	l.SetShowPagination(false)
 
-	return &model{list: l}, nil
+	return &model{
+		err:  nil,
+		list: l,
+	}, nil
 }
 
 func (m model) Init() tea.Cmd {

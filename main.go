@@ -25,8 +25,6 @@ func run() error {
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 
-	m.program = p
-
 	exitModel, err := p.Run()
 	if err != nil {
 		return err
