@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/tmux"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -60,6 +62,9 @@ var _ tea.Model = (*model)(nil)
 type model struct {
 	err error
 
+	keys keyMap
+	help help.Model
+
 	list list.Model
 }
 
@@ -81,8 +86,15 @@ func NewModel() (*model, error) {
 	l.SetShowHelp(false)
 	l.SetShowPagination(false)
 
+	l.KeyMap = list.KeyMap{
+		CursorUp:   keymap.Up,
+		CursorDown: keymap.Down,
+	}
+
 	return &model{
 		err:  nil,
+		keys: keymap,
+		help: help.New(),
 		list: l,
 	}, nil
 }
@@ -97,8 +109,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetWidth(msg.Width)
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "enter":
+		switch {
+		case key.Matches(msg, keymap.Quit):
+			return m, tea.Quit
+
+		case key.Matches(msg, keymap.Select):
 			session := m.list.SelectedItem().(item)
 
 			execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Name), func(err error) tea.Msg {
@@ -127,7 +142,7 @@ func (m model) View() string {
 
 	builder.WriteString(fmt.Sprintf("%s %s", AppName, Version))
 	builder.WriteByte('\n')
-	builder.WriteString(m.list.Help.View(m.list))
+	builder.WriteString(m.help.View(keymap))
 	builder.WriteByte('\n')
 	builder.WriteByte('\n')
 	builder.WriteString(m.list.View())
