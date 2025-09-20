@@ -8,7 +8,7 @@ import (
 var _ help.KeyMap = (*keyMap)(nil)
 
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Down, k.Down, k.Quit}
+	return []key.Binding{k.Quit, k.Down, k.Down, k.Rename}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
@@ -20,6 +20,7 @@ type keyMap struct {
 	Down   key.Binding
 	Quit   key.Binding
 	Select key.Binding
+	Rename key.Binding
 }
 
 var keymap = keyMap{
@@ -38,5 +39,9 @@ var keymap = keyMap{
 	Select: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "select"),
+	),
+	Rename: key.NewBinding(
+		key.WithKeys("r"),
+		key.WithHelp("r", "rename"),
 	),
 }

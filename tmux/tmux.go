@@ -61,10 +61,8 @@ func AttachSessionCommand(name string) *exec.Cmd {
 	}
 }
 
-// new session
+func RenameSession(name, newName string) error {
+	return exec.Command("tmux", "rename-session", "-t", name, newName).Run()
+}
 
 // delete session
-
-// attach session
-
-// rename session
