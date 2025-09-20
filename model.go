@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/listinput"
@@ -10,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var _ listinput.Item = (*sessionItem)(nil)
@@ -48,7 +50,8 @@ func (i *sessionItem) FilterValue() string {
 var _ tea.Model = (*model)(nil)
 
 type model struct {
-	err error
+	dump io.Writer
+	err  error
 
 	keys keyMap
 	help help.Model
@@ -56,7 +59,7 @@ type model struct {
 	list listinput.Model
 }
 
-func NewModel() (*model, error) {
+func NewModel(dump io.Writer) (*model, error) {
 	sessions, err := tmux.ListSession()
 	if err != nil {
 		return nil, err
@@ -80,6 +83,7 @@ func NewModel() (*model, error) {
 	}
 
 	return &model{
+		dump: dump,
 		err:  nil,
 		keys: keymap,
 		help: help.New(),
@@ -92,6 +96,10 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.dump != nil {
+		spew.Fdump(m.dump, msg)
+	}
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
