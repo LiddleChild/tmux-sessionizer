@@ -1,0 +1,2 @@
+- delete session (with confirmation)
+

@@ -16,35 +16,22 @@ import (
 
 var _ listinput.Item = (*sessionItem)(nil)
 
-type sessionItem struct {
-	session tmux.Session
-}
+type sessionItem tmux.Session
 
-func (i *sessionItem) Name() string {
-	if i.session.IsAttached {
-		return i.session.Name + " (attached)"
+func (i sessionItem) Label() string {
+	if i.IsAttached {
+		return i.Name + " (attached)"
 	}
 
-	return i.session.Name
+	return i.Name
 }
 
-func (i *sessionItem) Value() string {
-	return i.session.Name
+func (i sessionItem) Value() string {
+	return i.Name
 }
 
-func (i *sessionItem) OnValueChange(value string) tea.Cmd {
-	i.session.Name = value
-	return func() tea.Msg {
-		if err := tmux.RenameSession(i.session.Name, value); err != nil {
-			return QuitWithErr(err)
-		}
-
-		return nil
-	}
-}
-
-func (i *sessionItem) FilterValue() string {
-	return i.session.Name
+func (i sessionItem) FilterValue() string {
+	return i.Name
 }
 
 var _ tea.Model = (*model)(nil)
@@ -60,27 +47,22 @@ type model struct {
 }
 
 func NewModel(dump io.Writer) (*model, error) {
-	sessions, err := tmux.ListSession()
-	if err != nil {
-		return nil, err
-	}
+	// sessions, err := tmux.ListSession()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// items := []listinput.Item{}
+	// for _, session := range sessions {
+	// 	items = append(items, sessionItem(session))
+	// }
+	//
+	l := listinput.New([]listinput.Item{}, 0, 0)
 
-	items := []listinput.Item{}
-	for _, session := range sessions {
-		items = append(items, &sessionItem{session})
-	}
-
-	l := listinput.New(items, 0, len(sessions))
-	l.SetFilteringEnabled(false)
-	l.SetShowStatusBar(false)
-	l.SetShowTitle(false)
-	l.SetShowHelp(false)
-	l.SetShowPagination(false)
-
-	l.KeyMap = list.KeyMap{
+	l.SetKeyMap(list.KeyMap{
 		CursorUp:   keymap.Up,
 		CursorDown: keymap.Down,
-	}
+	})
 
 	return &model{
 		dump: dump,
@@ -92,7 +74,7 @@ func NewModel(dump io.Writer) (*model, error) {
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+	return ListTmuxSessionCmd
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -110,9 +92,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case !m.list.IsFocused() && key.Matches(msg, keymap.Select):
-			session := m.list.SelectedItem().(listinput.Item)
+			session := m.list.SelectedItem()
 
-			execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Name()), func(err error) tea.Msg {
+			execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Value()), func(err error) tea.Msg {
 				return QuitWithErr(err)
 			})
 
@@ -128,6 +110,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case QuitWithErrMsg:
 		m.err = msg.err
 		return m, tea.Quit
+
+	case listinput.InputSubmitedMsg:
+		item := m.list.Items()[msg.Index]
+
+		if err := tmux.RenameSession(item.Value(), msg.Value); err != nil {
+			return m, QuitWithErr(err)
+		}
+
+		return m, ListTmuxSessionCmd
+
+	case ListTmuxSessionMsg:
+		sessions, err := tmux.ListSession()
+		if err != nil {
+			return m, QuitWithErr(err)
+		}
+
+		items := []listinput.Item{}
+		for _, session := range sessions {
+			items = append(items, sessionItem(session))
+		}
+
+		return m, m.list.SetItems(items)
 	}
 
 	var cmd tea.Cmd

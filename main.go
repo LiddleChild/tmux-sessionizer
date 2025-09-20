@@ -33,6 +33,8 @@ func run() error {
 		if err != nil {
 			os.Exit(1)
 		}
+
+		fmt.Fprintln(dump, "DEBUG MODE")
 	}
 
 	m, err := NewModel(dump)

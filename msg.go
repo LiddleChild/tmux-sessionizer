@@ -11,3 +11,9 @@ func QuitWithErr(err error) tea.Cmd {
 		return QuitWithErrMsg{err: err}
 	}
 }
+
+type ListTmuxSessionMsg struct{}
+
+func ListTmuxSessionCmd() tea.Msg {
+	return ListTmuxSessionMsg{}
+}

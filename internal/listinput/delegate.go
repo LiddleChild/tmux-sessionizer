@@ -7,17 +7,9 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 var _ list.ItemDelegate = (*itemDelegate)(nil)
-
-var (
-	selectedItemStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("5")).
-		Background(lipgloss.Color("8")).
-		Bold(true)
-)
 
 type itemDelegate struct{}
 
@@ -34,9 +26,12 @@ func (d itemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd {
 			switch msg := msg.(type) {
 			case tea.KeyMsg:
 				switch msg.String() {
-				case "enter", "esc":
+				case "enter":
+					cmds = append(cmds, InputSubmitedCmd(i, listInputItem.input.Value()))
+					fallthrough
+
+				case "esc":
 					listInputItem.input.Blur()
-					cmds = append(cmds, listInputItem.OnValueChange(listInputItem.input.Value()))
 				}
 			}
 		}
@@ -58,12 +53,13 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		return
 	}
 
-	str := item.Name()
+	str := item.Label()
 	str += strings.Repeat(" ", max(m.Width()-len(str), 0))
 
 	if index == m.Index() {
 		if item.input.Focused() {
-			str = item.input.View()
+			item.input.Width = m.Width()
+			str = selectedItemStyle.Render(item.input.View())
 		} else {
 			str = selectedItemStyle.Render(str)
 		}
