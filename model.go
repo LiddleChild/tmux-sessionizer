@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/listinput"
-	"github.com/LiddleChild/tmux-sessionpane/tmux"
+	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
