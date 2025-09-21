@@ -5,9 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 	"time"
 
+	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -15,6 +17,11 @@ import (
 const (
 	DebugEntry = "debug.log"
 	ErrorEntry = "error.log"
+)
+
+var (
+	DebugEntryPath = path.Join(config.BaseConfigPath, "debug.log")
+	ErrorEntryPath = path.Join(config.BaseConfigPath, "error.log")
 )
 
 type LogLevel int
@@ -32,21 +39,19 @@ var (
 	entry    *os.File
 )
 
-func init() {
+func Init() error {
 	flag.Parse()
 
 	var err error
 	if *DebugFlag {
-		entry, err = os.OpenFile(DebugEntry, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+		entry, err = os.OpenFile(DebugEntryPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 		logLevel = LogLevelDebug
 	} else {
-		entry, err = os.OpenFile(ErrorEntry, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o644)
+		entry, err = os.OpenFile(ErrorEntryPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o644)
 		logLevel = LogLevelInfo
 	}
 
-	if err != nil {
-		panic(fmt.Errorf("failed to open entry: %w", err))
-	}
+	return err
 }
 
 func printTimestamp() string {

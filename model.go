@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/LiddleChild/tmux-sessionpane/internal/listinput"
 	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
@@ -153,7 +154,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var builder strings.Builder
 
-	builder.WriteString(fmt.Sprintf("%s %s", AppName, Version))
+	builder.WriteString(fmt.Sprintf("%s %s", config.AppName, config.Version))
 	builder.WriteByte('\n')
 
 	if m.list.IsFocused() {

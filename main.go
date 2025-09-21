@@ -3,12 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/LiddleChild/tmux-sessionpane/internal/config"
+	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	tea "github.com/charmbracelet/bubbletea"
-)
-
-const (
-	AppName = "tmux-sessionpane"
-	Version = "v0.2.1"
 )
 
 func main() {
@@ -18,6 +15,14 @@ func main() {
 }
 
 func run() error {
+	if err := config.Init(); err != nil {
+		return fmt.Errorf("failed to initialize: %w", err)
+	}
+
+	if err := log.Init(); err != nil {
+		return fmt.Errorf("failed to initialize logger: %w", err)
+	}
+
 	m, err := NewModel()
 	if err != nil {
 		return fmt.Errorf("error initializing app: %w", err)
