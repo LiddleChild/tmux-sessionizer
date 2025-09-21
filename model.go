@@ -30,6 +30,16 @@ func (i sessionItem) Value() string {
 	return i.Name
 }
 
+func (i *sessionItem) SetValue(value string) tea.Cmd {
+	if err := tmux.RenameSession(i.Name, value); err != nil {
+		return QuitWithErr(err)
+	}
+
+	i.Name = value
+
+	return ListTmuxSessionCmd
+}
+
 func (i sessionItem) FilterValue() string {
 	return i.Name
 }
@@ -38,7 +48,6 @@ var _ tea.Model = (*model)(nil)
 
 type model struct {
 	dump io.Writer
-	err  error
 
 	keys keyMap
 	help help.Model
@@ -47,16 +56,6 @@ type model struct {
 }
 
 func NewModel(dump io.Writer) (*model, error) {
-	// sessions, err := tmux.ListSession()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// items := []listinput.Item{}
-	// for _, session := range sessions {
-	// 	items = append(items, sessionItem(session))
-	// }
-	//
 	l := listinput.New([]listinput.Item{}, 0, 0)
 
 	l.SetKeyMap(list.KeyMap{
@@ -66,7 +65,6 @@ func NewModel(dump io.Writer) (*model, error) {
 
 	return &model{
 		dump: dump,
-		err:  nil,
 		keys: keymap,
 		help: help.New(),
 		list: l,
@@ -108,17 +106,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case QuitWithErrMsg:
-		m.err = msg.err
+		spew.Fdump(m.dump, msg.err.Error())
 		return m, tea.Quit
-
-	case listinput.InputSubmitedMsg:
-		item := m.list.Items()[msg.Index]
-
-		if err := tmux.RenameSession(item.Value(), msg.Value); err != nil {
-			return m, QuitWithErr(err)
-		}
-
-		return m, ListTmuxSessionCmd
 
 	case ListTmuxSessionMsg:
 		sessions, err := tmux.ListSession()
@@ -128,7 +117,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		items := []listinput.Item{}
 		for _, session := range sessions {
-			items = append(items, sessionItem(session))
+			sessionItem := sessionItem(session)
+			items = append(items, &sessionItem)
 		}
 
 		return m, m.list.SetItems(items)

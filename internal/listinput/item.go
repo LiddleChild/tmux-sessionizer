@@ -3,6 +3,7 @@ package listinput
 import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 type Item interface {
@@ -10,6 +11,7 @@ type Item interface {
 
 	Label() string
 	Value() string
+	SetValue(val string) tea.Cmd
 }
 
 type item struct {

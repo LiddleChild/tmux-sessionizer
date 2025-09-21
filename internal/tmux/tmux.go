@@ -3,10 +3,13 @@ package tmux
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"slices"
 	"time"
+
+	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 )
 
 type session struct {
@@ -62,7 +65,16 @@ func AttachSessionCommand(name string) *exec.Cmd {
 }
 
 func RenameSession(name, newName string) error {
-	return exec.Command("tmux", "rename-session", "-t", name, newName).Run()
+	fmt.Fprintf(log.LogFile, "%s %s\n", name, newName)
+	cmd := exec.Command("tmux", "rename-session", "-t", name, newName)
+
+	cmd.Stderr = log.LogFile
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // delete session
