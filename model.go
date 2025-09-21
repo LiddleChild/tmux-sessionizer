@@ -151,8 +151,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	log.Printlnf(log.LogLevelInfo, "view")
-
 	var builder strings.Builder
 
 	builder.WriteString(fmt.Sprintf("%s %s", AppName, Version))
