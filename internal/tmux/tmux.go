@@ -1,3 +1,4 @@
+// Package tmux
 package tmux
 
 import (

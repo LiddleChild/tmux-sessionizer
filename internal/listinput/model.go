@@ -1,3 +1,4 @@
+// Package listinput
 package listinput
 
 import (
