@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/LiddleChild/tmux-sessionpane/internal/listinput"
@@ -152,21 +151,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var builder strings.Builder
-
-	builder.WriteString(fmt.Sprintf("%s %s", config.AppName, config.AppVersion))
-	builder.WriteByte('\n')
-
+	var help string
 	if m.list.IsFocused() {
-		builder.WriteString(m.help.FullHelpView(focusedKeymap.FullHelp()))
-		builder.WriteByte('\n')
+		help = m.help.FullHelpView(focusedKeymap.FullHelp()) + "\n"
 	} else {
-		builder.WriteString(m.help.FullHelpView(keymap.FullHelp()))
+		help = m.help.FullHelpView(keymap.FullHelp())
 	}
 
-	builder.WriteByte('\n')
-	builder.WriteByte('\n')
-	builder.WriteString(m.list.View())
-
-	return builder.String()
+	return lipgloss.JoinVertical(lipgloss.Top,
+		fmt.Sprintf("%s %s", config.AppName, config.AppVersion),
+		help,
+		"",
+		m.list.View(),
+	)
 }
