@@ -9,7 +9,6 @@ import (
 	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -54,9 +53,11 @@ type model struct {
 func NewModel() (*model, error) {
 	l := listinput.New([]listinput.Item{}, 0, 0)
 
-	l.SetKeyMap(list.KeyMap{
+	l.SetKeyMap(listinput.KeyMap{
 		CursorUp:   keymap.Up,
 		CursorDown: keymap.Down,
+		Submit:     focusedKeymap.Submit,
+		Cancel:     focusedKeymap.Cancel,
 	})
 
 	return &model{
@@ -128,7 +129,13 @@ func (m model) View() string {
 
 	builder.WriteString(fmt.Sprintf("%s %s", AppName, Version))
 	builder.WriteByte('\n')
-	builder.WriteString(m.help.View(keymap))
+
+	if m.list.IsFocused() {
+		builder.WriteString(m.help.View(focusedKeymap))
+	} else {
+		builder.WriteString(m.help.View(keymap))
+	}
+
 	builder.WriteByte('\n')
 	builder.WriteByte('\n')
 	builder.WriteString(m.list.View())

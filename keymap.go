@@ -8,7 +8,7 @@ import (
 var _ help.KeyMap = (*keyMap)(nil)
 
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Quit, k.Down, k.Down, k.Rename}
+	return []key.Binding{k.Quit, k.Up, k.Down, k.Select, k.Rename}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
@@ -38,10 +38,36 @@ var keymap = keyMap{
 	),
 	Select: key.NewBinding(
 		key.WithKeys("enter"),
-		key.WithHelp("enter", "select"),
+		key.WithHelp("enter", "goto"),
 	),
 	Rename: key.NewBinding(
 		key.WithKeys("r"),
 		key.WithHelp("r", "rename"),
+	),
+}
+
+var _ help.KeyMap = (*focusedKeyMap)(nil)
+
+func (k focusedKeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Submit, k.Cancel}
+}
+
+func (k focusedKeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{k.ShortHelp()}
+}
+
+type focusedKeyMap struct {
+	Submit key.Binding
+	Cancel key.Binding
+}
+
+var focusedKeymap = focusedKeyMap{
+	Submit: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "rename"),
+	),
+	Cancel: key.NewBinding(
+		key.WithKeys("esc"),
+		key.WithHelp("esc", "cancel"),
 	),
 }

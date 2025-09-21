@@ -5,13 +5,16 @@ import (
 	"io"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 var _ list.ItemDelegate = (*itemDelegate)(nil)
 
-type itemDelegate struct{}
+type itemDelegate struct {
+	keyMap KeyMap
+}
 
 func (d itemDelegate) Height() int { return 1 }
 
@@ -25,12 +28,12 @@ func (d itemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd {
 		if listInputItem.input.Focused() {
 			switch msg := msg.(type) {
 			case tea.KeyMsg:
-				switch msg.String() {
-				case "enter":
+				switch {
+				case key.Matches(msg, d.keyMap.Submit):
 					cmds = append(cmds, listInputItem.SetValue(listInputItem.input.Value()))
 					fallthrough
 
-				case "esc":
+				case key.Matches(msg, d.keyMap.Cancel):
 					listInputItem.input.Blur()
 				}
 			}

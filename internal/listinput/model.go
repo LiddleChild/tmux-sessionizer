@@ -7,8 +7,7 @@ import (
 )
 
 type Model struct {
-	list list.Model
-
+	list     list.Model
 	delegate itemDelegate
 }
 
@@ -101,8 +100,15 @@ func (m *Model) SetWidth(width int) {
 	m.list.SetWidth(width)
 }
 
-func (m *Model) SetKeyMap(keyMap list.KeyMap) {
-	m.list.KeyMap = keyMap
+func (m *Model) SetKeyMap(keyMap KeyMap) {
+	m.delegate.keyMap = keyMap
+
+	m.list.SetDelegate(m.delegate)
+
+	m.list.KeyMap = list.KeyMap{
+		CursorUp:   keyMap.CursorUp,
+		CursorDown: keyMap.CursorDown,
+	}
 }
 
 func (m *Model) SetItems(items []Item) tea.Cmd {
