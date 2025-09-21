@@ -1,0 +1,1 @@
+- combine tmux-sessionpane and space
