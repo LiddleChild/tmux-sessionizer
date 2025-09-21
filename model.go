@@ -131,9 +131,9 @@ func (m model) View() string {
 	builder.WriteByte('\n')
 
 	if m.list.IsFocused() {
-		builder.WriteString(m.help.View(focusedKeymap))
+		builder.WriteString(m.help.FullHelpView(focusedKeymap.FullHelp()))
 	} else {
-		builder.WriteString(m.help.View(keymap))
+		builder.WriteString(m.help.FullHelpView(keymap.FullHelp()))
 	}
 
 	builder.WriteByte('\n')

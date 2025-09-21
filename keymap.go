@@ -1,18 +1,21 @@
 package main
 
 import (
+	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 )
 
 var _ help.KeyMap = (*keyMap)(nil)
 
-func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Quit, k.Up, k.Down, k.Select, k.Rename}
-}
-
+func (k keyMap) ShortHelp() []key.Binding { return []key.Binding{} }
 func (k keyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{k.ShortHelp()}
+	return utils.Transpose(
+		[][]key.Binding{
+			{k.Up, k.Down, k.Quit},
+			{k.Select, k.Rename, k.Delete},
+		},
+	)
 }
 
 type keyMap struct {
@@ -21,6 +24,7 @@ type keyMap struct {
 	Quit   key.Binding
 	Select key.Binding
 	Rename key.Binding
+	Delete key.Binding
 }
 
 var keymap = keyMap{
@@ -44,16 +48,21 @@ var keymap = keyMap{
 		key.WithKeys("r"),
 		key.WithHelp("r", "rename"),
 	),
+	Delete: key.NewBinding(
+		key.WithKeys("d"),
+		key.WithHelp("d", "delete"),
+	),
 }
 
 var _ help.KeyMap = (*focusedKeyMap)(nil)
 
-func (k focusedKeyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Submit, k.Cancel}
-}
-
+func (k focusedKeyMap) ShortHelp() []key.Binding { return []key.Binding{} }
 func (k focusedKeyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{k.ShortHelp()}
+	return utils.Transpose(
+		[][]key.Binding{
+			{k.Submit, k.Cancel},
+		},
+	)
 }
 
 type focusedKeyMap struct {
