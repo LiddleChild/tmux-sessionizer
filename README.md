@@ -6,7 +6,7 @@
 
 2. Install binary
 ```bash
-cargo install --path .
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/LiddleChild/tmux-sessionpane/refs/heads/main/scripts/install.sh)"
 ```
 
 3. Put key binding in `tmux.conf`
