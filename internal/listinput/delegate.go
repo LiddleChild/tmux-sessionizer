@@ -27,7 +27,7 @@ func (d itemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd {
 			case tea.KeyMsg:
 				switch msg.String() {
 				case "enter":
-					listInputItem.SetValue(listInputItem.input.Value())
+					cmds = append(cmds, listInputItem.SetValue(listInputItem.input.Value()))
 					fallthrough
 
 				case "esc":

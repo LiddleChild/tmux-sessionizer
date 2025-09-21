@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"slices"
 	"time"
-
-	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 )
 
 type session struct {
@@ -65,13 +63,13 @@ func AttachSessionCommand(name string) *exec.Cmd {
 }
 
 func RenameSession(name, newName string) error {
-	fmt.Fprintf(log.LogFile, "%s %s\n", name, newName)
 	cmd := exec.Command("tmux", "rename-session", "-t", name, newName)
 
-	cmd.Stderr = log.LogFile
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("%w: %s", err, stderr.String())
 	}
 
 	return nil

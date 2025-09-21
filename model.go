@@ -2,16 +2,15 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/listinput"
+	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/davecgh/go-spew/spew"
 )
 
 var _ listinput.Item = (*sessionItem)(nil)
@@ -32,11 +31,10 @@ func (i sessionItem) Value() string {
 
 func (i *sessionItem) SetValue(value string) tea.Cmd {
 	if err := tmux.RenameSession(i.Name, value); err != nil {
-		return QuitWithErr(err)
+		return ErrCmd(err)
 	}
 
 	i.Name = value
-
 	return ListTmuxSessionCmd
 }
 
@@ -47,15 +45,13 @@ func (i sessionItem) FilterValue() string {
 var _ tea.Model = (*model)(nil)
 
 type model struct {
-	dump io.Writer
-
 	keys keyMap
 	help help.Model
 
 	list listinput.Model
 }
 
-func NewModel(dump io.Writer) (*model, error) {
+func NewModel() (*model, error) {
 	l := listinput.New([]listinput.Item{}, 0, 0)
 
 	l.SetKeyMap(list.KeyMap{
@@ -64,7 +60,6 @@ func NewModel(dump io.Writer) (*model, error) {
 	})
 
 	return &model{
-		dump: dump,
 		keys: keymap,
 		help: help.New(),
 		list: l,
@@ -76,9 +71,7 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.dump != nil {
-		spew.Fdump(m.dump, msg)
-	}
+	log.Dump(log.LogLevelDebug, msg)
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -93,7 +86,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			session := m.list.SelectedItem()
 
 			execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Value()), func(err error) tea.Msg {
-				return QuitWithErr(err)
+				return tea.Sequence(ErrCmd(err), tea.Quit)
 			})
 
 			return m, tea.Sequence(
@@ -105,14 +98,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.list.FocusSelectedItem()
 		}
 
-	case QuitWithErrMsg:
-		spew.Fdump(m.dump, msg.err.Error())
-		return m, tea.Quit
+	case ErrMsg:
+		log.Printlnf(log.LogLevelError, msg.Error())
+		return m, nil
 
 	case ListTmuxSessionMsg:
 		sessions, err := tmux.ListSession()
 		if err != nil {
-			return m, QuitWithErr(err)
+			return m, tea.Sequence(ErrCmd(err), tea.Quit)
 		}
 
 		items := []listinput.Item{}

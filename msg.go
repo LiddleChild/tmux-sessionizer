@@ -2,13 +2,11 @@ package main
 
 import tea "github.com/charmbracelet/bubbletea"
 
-type QuitWithErrMsg struct {
-	err error
-}
+type ErrMsg error
 
-func QuitWithErr(err error) tea.Cmd {
+func ErrCmd(err error) tea.Cmd {
 	return func() tea.Msg {
-		return QuitWithErrMsg{err: err}
+		return ErrMsg(err)
 	}
 }
 
