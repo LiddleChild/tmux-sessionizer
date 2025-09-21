@@ -2,6 +2,7 @@
 package listinput
 
 import (
+	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -84,8 +85,12 @@ func (m Model) FocusSelectedItem() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+func (m Model) Index() int {
+	return m.list.Index()
+}
+
 func (m Model) SelectedItem() Item {
-	return m.list.SelectedItem().(Item)
+	return m.list.SelectedItem().(item).Item
 }
 
 func (m Model) Items() []Item {
@@ -95,6 +100,10 @@ func (m Model) Items() []Item {
 	}
 
 	return items
+}
+
+func (m *Model) CursorUp() {
+	m.list.CursorUp()
 }
 
 func (m *Model) SetWidth(width int) {
@@ -128,7 +137,11 @@ func (m *Model) SetItems(items []Item) tea.Cmd {
 		}
 	}
 
-	m.list.SetHeight(len(listItems))
+	m.list.SetHeight(len(listItems) + 1)
+
+	log.Dump(log.LogLevelInfo, items)
+
+	log.Printlnf(log.LogLevelInfo, "%d", m.list.Height())
 
 	return m.list.SetItems(listItems)
 }

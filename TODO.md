@@ -1,2 +1,3 @@
-- delete session (with confirmation)
+- bold attached session
+- create session
 

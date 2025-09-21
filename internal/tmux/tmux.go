@@ -76,4 +76,15 @@ func RenameSession(name, newName string) error {
 	return nil
 }
 
-// delete session
+func DeleteSession(name string) error {
+	cmd := exec.Command("tmux", "kill-session", "-t", name)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("%w: %s", err, stderr.String())
+	}
+
+	return nil
+}

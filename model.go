@@ -97,6 +97,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case !m.list.IsFocused() && key.Matches(msg, keymap.Rename):
 			return m, m.list.FocusSelectedItem()
+
+		case !m.list.IsFocused() && key.Matches(msg, keymap.Delete):
+			session := m.list.SelectedItem().(*sessionItem)
+
+			if session.IsAttached {
+				return m, nil
+			}
+
+			if m.list.Index() == len(m.list.Items())-1 {
+				m.list.CursorUp()
+			}
+
+			if err := tmux.DeleteSession(session.Name); err != nil {
+				return m, ErrCmd(err)
+			}
+
+			return m, ListTmuxSessionCmd
 		}
 
 	case ErrMsg:
@@ -109,7 +126,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Sequence(ErrCmd(err), tea.Quit)
 		}
 
-		items := []listinput.Item{}
+		items := make([]listinput.Item, 0, len(sessions))
 		for _, session := range sessions {
 			sessionItem := sessionItem(session)
 			items = append(items, &sessionItem)
@@ -125,6 +142,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	log.Printlnf(log.LogLevelInfo, "view")
+
 	var builder strings.Builder
 
 	builder.WriteString(fmt.Sprintf("%s %s", AppName, Version))
