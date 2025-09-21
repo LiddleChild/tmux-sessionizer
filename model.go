@@ -154,7 +154,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var builder strings.Builder
 
-	builder.WriteString(fmt.Sprintf("%s %s", config.AppName, config.Version))
+	builder.WriteString(fmt.Sprintf("%s %s", config.AppName, config.AppVersion))
 	builder.WriteByte('\n')
 
 	if m.list.IsFocused() {

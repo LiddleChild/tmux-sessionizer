@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	AppName = "tmux-sessionpane"
-	Version = "v0.2.1"
+	AppName    = "tmux-sessionpane"
+	AppVersion = "v0.2.1"
 )
 
 var (
