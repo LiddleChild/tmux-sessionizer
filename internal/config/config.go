@@ -9,7 +9,7 @@ import (
 
 const (
 	AppName    = "tmux-sessionpane"
-	AppVersion = "v0.2.1"
+	AppVersion = "v0.2.2"
 )
 
 var (
