@@ -51,7 +51,7 @@ type model struct {
 }
 
 func NewModel() (*model, error) {
-	l := listinput.New([]listinput.Item{}, 0, 0)
+	l := listinput.New([]listinput.Item{})
 
 	l.SetKeyMap(listinput.KeyMap{
 		CursorUp:   keymap.Up,

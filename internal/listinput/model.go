@@ -11,7 +11,7 @@ type Model struct {
 	delegate itemDelegate
 }
 
-func New(items []Item, width int, height int) Model {
+func New(items []Item) Model {
 	listItems := make([]list.Item, len(items))
 	for i, listItem := range items {
 		input := textinput.New()
@@ -29,7 +29,7 @@ func New(items []Item, width int, height int) Model {
 
 	delegate := itemDelegate{}
 
-	list := list.New(listItems, delegate, width, height)
+	list := list.New(listItems, delegate, 0, len(listItems))
 	list.SetFilteringEnabled(false)
 	list.SetShowStatusBar(false)
 	list.SetShowTitle(false)
