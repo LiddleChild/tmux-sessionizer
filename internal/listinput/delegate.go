@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var _ list.ItemDelegate = (*itemDelegate)(nil)
@@ -60,12 +61,16 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	str += strings.Repeat(" ", max(m.Width()-len(str), 0))
 
 	if index == m.Index() {
+		style := item.Style(selectedItemStyle)
+
 		if item.input.Focused() {
 			item.input.Width = m.Width()
-			str = selectedItemStyle.Render(item.input.View())
+			str = style.Render(item.input.View())
 		} else {
-			str = selectedItemStyle.Render(str)
+			str = style.Render(str)
 		}
+	} else {
+		str = item.Style(lipgloss.NewStyle()).Render(str)
 	}
 
 	fmt.Fprint(w, str)

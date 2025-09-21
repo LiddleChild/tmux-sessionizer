@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var _ listinput.Item = (*sessionItem)(nil)
@@ -22,6 +23,14 @@ func (i sessionItem) Label() string {
 	}
 
 	return i.Name
+}
+
+func (i sessionItem) Style(style lipgloss.Style) lipgloss.Style {
+	if i.IsAttached {
+		return style.Bold(true)
+	}
+
+	return style
 }
 
 func (i sessionItem) Value() string {
@@ -151,6 +160,7 @@ func (m model) View() string {
 
 	if m.list.IsFocused() {
 		builder.WriteString(m.help.FullHelpView(focusedKeymap.FullHelp()))
+		builder.WriteByte('\n')
 	} else {
 		builder.WriteString(m.help.FullHelpView(keymap.FullHelp()))
 	}
