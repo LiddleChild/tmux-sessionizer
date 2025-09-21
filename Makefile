@@ -1,3 +1,6 @@
 .PHONY: install
 install:
-	cargo install --path .
+	go install
+
+debug:
+	tail -f ~/.config/tmux-sessionpane/debug.log
