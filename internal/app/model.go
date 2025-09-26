@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"fmt"
@@ -50,16 +50,16 @@ func (i sessionItem) FilterValue() string {
 	return i.Name
 }
 
-var _ tea.Model = (*model)(nil)
+var _ tea.Model = (*Model)(nil)
 
-type model struct {
+type Model struct {
 	keys keyMap
 	help help.Model
 
 	list listinput.Model
 }
 
-func NewModel() (*model, error) {
+func New() (*Model, error) {
 	l := listinput.New([]listinput.Item{})
 
 	l.SetKeyMap(listinput.KeyMap{
@@ -69,18 +69,18 @@ func NewModel() (*model, error) {
 		Cancel:     focusedKeymap.Cancel,
 	})
 
-	return &model{
+	return &Model{
 		keys: keymap,
 		help: help.New(),
 		list: l,
 	}, nil
 }
 
-func (m model) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	return ListTmuxSessionCmd
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Dump(log.LogLevelDebug, msg)
 
 	switch msg := msg.(type) {
@@ -158,7 +158,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
+func (m Model) View() string {
 	var help string
 	if m.list.IsFocused() {
 		help = m.help.FullHelpView(focusedKeymap.FullHelp()) + "\n"
