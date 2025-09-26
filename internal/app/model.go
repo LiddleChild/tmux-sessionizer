@@ -126,7 +126,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case ErrMsg:
-		log.Printlnf(log.LogLevelError, msg.Error())
+		log.Println(log.LogLevelError, msg.Error())
 		return m, nil
 
 	case ListTmuxSessionMsg:

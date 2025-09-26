@@ -80,35 +80,39 @@ func printLogLevel(level LogLevel) string {
 	}
 }
 
-func print(s ...string) {
-	fmt.Fprint(entry, strings.Join(s, " "))
+func print(level LogLevel, s ...string) {
+	if !*DebugFlag {
+		return
+	}
+
+	if level >= logLevel {
+		fmt.Fprint(entry, strings.Join(s, " "))
+	}
+}
+
+func Println(level LogLevel, s string) {
+	print(
+		logLevel,
+		s,
+		"\n",
+	)
 }
 
 func Printlnf(level LogLevel, format string, a ...any) {
-	if entry == nil {
-		return
-	}
-
-	if level >= logLevel {
-		print(
-			printTimestamp(),
-			printLogLevel(level),
-			fmt.Sprintf(format, a...),
-			"\n",
-		)
-	}
+	print(
+		logLevel,
+		printTimestamp(),
+		printLogLevel(level),
+		fmt.Sprintf(format, a...),
+		"\n",
+	)
 }
 
 func Dump(level LogLevel, v any) {
-	if entry == nil {
-		return
-	}
-
-	if level >= logLevel {
-		print(
-			printTimestamp(),
-			printLogLevel(level),
-			spew.Sdump(v),
-		)
-	}
+	print(
+		logLevel,
+		printTimestamp(),
+		printLogLevel(level),
+		spew.Sdump(v),
+	)
 }
