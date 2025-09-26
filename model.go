@@ -135,11 +135,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Sequence(ErrCmd(err), tea.Quit)
 		}
 
+		var attached int
+
 		items := make([]listinput.Item, 0, len(sessions))
-		for _, session := range sessions {
+		for i, session := range sessions {
+			if session.IsAttached {
+				attached = i
+			}
+
 			sessionItem := sessionItem(session)
 			items = append(items, &sessionItem)
 		}
+
+		m.list.SetCursor(attached)
 
 		return m, m.list.SetItems(items)
 	}
