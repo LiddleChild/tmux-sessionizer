@@ -3,7 +3,6 @@ package listinput
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -58,20 +57,17 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	}
 
 	str := item.Label()
-	str += strings.Repeat(" ", max(m.Width()-len(str), 0))
 
+	var style lipgloss.Style
 	if index == m.Index() {
-		style := item.Style(selectedItemStyle)
-
-		if item.input.Focused() {
-			item.input.Width = m.Width()
-			str = style.Render(item.input.View())
-		} else {
-			str = style.Render(str)
-		}
+		style = item.Style(selectedItemStyle)
 	} else {
-		str = item.Style(lipgloss.NewStyle()).Render(str)
+		style = item.Style(lipgloss.NewStyle())
 	}
 
-	fmt.Fprint(w, str)
+	if item.input.Focused() {
+		str = item.input.View()
+	}
+
+	fmt.Fprint(w, style.Width(m.Width()).Render(str))
 }
