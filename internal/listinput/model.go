@@ -140,3 +140,7 @@ func (m *Model) SetItems(items []Item) tea.Cmd {
 
 	return m.list.SetItems(listItems)
 }
+
+func (m *Model) SetCursor(cursor int) {
+	m.list.Select(cursor)
+}

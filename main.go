@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/LiddleChild/tmux-sessionpane/internal/app"
 	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,7 +24,7 @@ func run() error {
 		return fmt.Errorf("failed to initialize logger: %w", err)
 	}
 
-	m, err := NewModel()
+	m, err := app.New()
 	if err != nil {
 		return fmt.Errorf("error initializing app: %w", err)
 	}

@@ -18,7 +18,7 @@ if ! command -v go &> /dev/null; then
 fi
 
 # clone
-git clone https://github.com/LiddleChild/tmux-sessionpane.git --branch $BRANCH /tmp/$APP_NAME
+git clone https://github.com/LiddleChild/tmux-sessionpane.git --depth 1 --branch $BRANCH /tmp/$APP_NAME
 
 # build and put binary in path
 cd /tmp/$APP_NAME; go install
