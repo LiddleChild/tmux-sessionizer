@@ -11,7 +11,6 @@ var _ tea.Model = (*Model)(nil)
 
 type Model struct {
 	superlist superlist.Model
-	keymap    keyMap
 }
 
 func New() (Model, error) {
@@ -19,7 +18,6 @@ func New() (Model, error) {
 
 	return Model{
 		superlist: superlist,
-		keymap:    keymap,
 	}, nil
 }
 
@@ -32,7 +30,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if key.Matches(msg, m.keymap.Quit) {
+		if key.Matches(msg, keyMap.Quit) {
 			return m, tea.Quit
 		}
 	}
