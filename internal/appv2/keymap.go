@@ -54,10 +54,10 @@ var keyMap = KeyMap{
 	),
 }
 
-var _ help.KeyMap = (*focusedKeyMap)(nil)
+var _ help.KeyMap = (*FocusedKeyMap)(nil)
 
-func (k focusedKeyMap) ShortHelp() []key.Binding { return []key.Binding{} }
-func (k focusedKeyMap) FullHelp() [][]key.Binding {
+func (k FocusedKeyMap) ShortHelp() []key.Binding { return []key.Binding{} }
+func (k FocusedKeyMap) FullHelp() [][]key.Binding {
 	return utils.Transpose(
 		[][]key.Binding{
 			{k.Submit, k.Cancel},
@@ -65,12 +65,12 @@ func (k focusedKeyMap) FullHelp() [][]key.Binding {
 	)
 }
 
-type focusedKeyMap struct {
+type FocusedKeyMap struct {
 	Submit key.Binding
 	Cancel key.Binding
 }
 
-var focusedKeymap = focusedKeyMap{
+var focusedKeyMap = FocusedKeyMap{
 	Submit: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "rename"),

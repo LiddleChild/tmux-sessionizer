@@ -1,6 +1,16 @@
 package superlist
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
+
+type InputItem interface {
+	Value() string
+	SetValue(string) tea.Cmd
+
+	Item
+}
 
 type Item interface {
 	Name() string

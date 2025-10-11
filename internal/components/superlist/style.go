@@ -7,8 +7,8 @@ var (
 			Italic(true).
 			Foreground(lipgloss.Color("8"))
 
-	hoverItemStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("5")).
-			Background(lipgloss.Color("8")).
-			Bold(true)
+	hoveredItemStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("5")).
+				Background(lipgloss.Color("8")).
+				Bold(true)
 )

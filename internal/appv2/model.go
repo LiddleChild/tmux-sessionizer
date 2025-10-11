@@ -22,7 +22,7 @@ func New() (Model, error) {
 
 	sessionItems := make([]superlist.Item, 0, len(sessions))
 	for _, s := range sessions {
-		sessionItems = append(sessionItems, sessionItem{s})
+		sessionItems = append(sessionItems, &sessionItem{s})
 	}
 
 	entryItems := []superlist.Item{
@@ -42,10 +42,14 @@ func New() (Model, error) {
 		},
 	}
 
-	superlist := superlist.New(groups).SetKeyMap(superlist.KeyMap{
-		CursorUp:   keyMap.Up,
-		CursorDown: keyMap.Down,
-	})
+	superlist := superlist.
+		New(groups).
+		SetKeyMap(superlist.KeyMap{
+			CursorUp:   keyMap.Up,
+			CursorDown: keyMap.Down,
+			Submit:     focusedKeyMap.Submit,
+			Cancel:     focusedKeyMap.Cancel,
+		})
 
 	return Model{
 		superlist: superlist,
@@ -67,8 +71,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 
 	case tea.KeyMsg:
-		if key.Matches(msg, keyMap.Quit) {
+		switch {
+		case !m.superlist.Focused() && key.Matches(msg, keyMap.Quit):
 			return m, tea.Quit
+
+		case key.Matches(msg, keyMap.Rename):
+			return m, m.superlist.Focus()
 		}
 	}
 
