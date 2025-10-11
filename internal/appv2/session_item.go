@@ -21,5 +21,9 @@ func (i sessionItem) Name() string {
 }
 
 func (i sessionItem) Style(style lipgloss.Style) lipgloss.Style {
-	return style.Bold(i.IsAttached)
+	if i.IsAttached {
+		return style.Bold(true)
+	}
+
+	return style
 }
