@@ -48,6 +48,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case !m.superlist.Focused() && key.Matches(msg, keyMap.Quit):
 			return m, tea.Quit
 
+		case !m.superlist.Focused() && key.Matches(msg, keyMap.Select):
+			item := m.superlist.GetSelectedItem()
+
+			switch item := item.(type) {
+			case *sessionItem:
+				session := item.Session
+				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Name), func(err error) tea.Msg {
+					return tea.Sequence(ErrCmd(err), tea.Quit)
+				})
+
+				return m, tea.Sequence(
+					execProcessCmd,
+					tea.Quit,
+				)
+			}
+
 		case !m.superlist.Focused() && key.Matches(msg, keyMap.Rename):
 			return m, m.superlist.Focus()
 		}
