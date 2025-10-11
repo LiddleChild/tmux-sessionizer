@@ -20,7 +20,7 @@ type Model struct {
 	input textinput.Model
 }
 
-func New(groups []ItemGroup) Model {
+func New(items []ItemGroup) Model {
 	input := textinput.New()
 	input.Prompt = ""
 	input.TextStyle = hoveredItemStyle
@@ -29,7 +29,7 @@ func New(groups []ItemGroup) Model {
 	input.Cursor.TextStyle = hoveredItemStyle
 
 	return Model{
-		groups: groups,
+		groups: items,
 		cursor: 0,
 		width:  0,
 		height: 0,
@@ -62,7 +62,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 		case m.Focused() && key.Matches(msg, m.keyMap.Submit):
 			m.input.Blur()
-			return m, m.GetSelectedItem().(InputItem).SetValue(m.input.Value())
+
+			item := m.GetSelectedItem().(InputItem)
+
+			item.SetValue(m.input.Value())
+			return m, SubmitCmd(item.Value(), m.input.Value())
 
 		case m.Focused() && key.Matches(msg, m.keyMap.Cancel):
 			m.input.Blur()
@@ -158,4 +162,16 @@ func (m *Model) Focus() tea.Cmd {
 	}
 
 	return nil
+}
+
+func (m *Model) SetCursor(cursor int) {
+	m.cursor = cursor
+}
+
+func (m *Model) SetItems(items []ItemGroup) {
+	m.groups = items
+}
+
+func (m Model) GetItems() []ItemGroup {
+	return m.groups
 }

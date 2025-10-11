@@ -5,7 +5,6 @@ import (
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
 	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -36,11 +35,6 @@ func (i sessionItem) Value() string {
 	return i.Session.Name
 }
 
-func (i *sessionItem) SetValue(value string) tea.Cmd {
-	if err := tmux.RenameSession(i.Session.Name, value); err != nil {
-		return ErrCmd(err)
-	}
-
+func (i *sessionItem) SetValue(value string) {
 	i.Session.Name = value
-	return ListTmuxSessionCmd
 }
