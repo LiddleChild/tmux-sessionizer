@@ -53,8 +53,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			switch item := item.(type) {
 			case *sessionItem:
-				session := item.Session
-				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(session.Name), func(err error) tea.Msg {
+				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(item.Value()), func(err error) tea.Msg {
 					return tea.Sequence(ErrCmd(err), tea.Quit)
 				})
 
@@ -62,6 +61,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					execProcessCmd,
 					tea.Quit,
 				)
+			}
+
+		case !m.superlist.Focused() && key.Matches(msg, keyMap.Delete):
+			item := m.superlist.GetSelectedItem()
+
+			if session, ok := item.(*sessionItem); ok {
+				if session.IsAttached {
+					return m, nil
+				}
+
+				if m.superlist.GetCursor() == len(m.superlist.GetItems())-1 {
+					m.superlist.CursorUp()
+				}
+
+				if err := tmux.DeleteSession(session.Value()); err != nil {
+					return m, ErrCmd(err)
+				}
+
+				return m, ListTmuxSessionCmd
 			}
 
 		case !m.superlist.Focused() && key.Matches(msg, keyMap.Rename):

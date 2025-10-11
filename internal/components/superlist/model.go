@@ -55,10 +55,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keyMap.CursorUp):
-			m.cursor = max(m.cursor-1, 0)
+			m.CursorUp()
 
 		case key.Matches(msg, m.keyMap.CursorDown):
-			m.cursor = min(m.cursor+1, m.Length()-1)
+			m.CursorDown()
 
 		case m.Focused() && key.Matches(msg, m.keyMap.Submit):
 			m.input.Blur()
@@ -166,6 +166,18 @@ func (m *Model) Focus() tea.Cmd {
 
 func (m *Model) SetCursor(cursor int) {
 	m.cursor = cursor
+}
+
+func (m *Model) CursorUp() {
+	m.cursor = max(m.cursor-1, 0)
+}
+
+func (m *Model) CursorDown() {
+	m.cursor = min(m.cursor+1, m.Length()-1)
+}
+
+func (m Model) GetCursor() int {
+	return m.cursor
 }
 
 func (m *Model) SetItems(items []ItemGroup) {
