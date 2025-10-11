@@ -3,6 +3,7 @@ package appv2
 import (
 	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
 	"github.com/LiddleChild/tmux-sessionpane/internal/log"
+	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -14,7 +15,37 @@ type Model struct {
 }
 
 func New() (Model, error) {
-	superlist := superlist.New()
+	sessions, err := tmux.ListSession()
+	if err != nil {
+		return Model{}, err
+	}
+
+	sessionItems := make([]superlist.Item, 0, len(sessions))
+	for _, s := range sessions {
+		sessionItems = append(sessionItems, sessionItem{s})
+	}
+
+	entryItems := []superlist.Item{
+		entryItem("~/.config/"),
+		entryItem("~/dotfiles/"),
+		entryItem("~/Documents/Projects/"),
+	}
+
+	groups := []superlist.ItemGroup{
+		{
+			Name:  "Sessions",
+			Items: sessionItems,
+		},
+		{
+			Name:  "Entries",
+			Items: entryItems,
+		},
+	}
+
+	superlist := superlist.New(groups).SetKeyMap(superlist.KeyMap{
+		CursorUp:   keyMap.Up,
+		CursorDown: keyMap.Down,
+	})
 
 	return Model{
 		superlist: superlist,
@@ -29,6 +60,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Dump(log.LogLevelDebug, msg)
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		var cmd tea.Cmd
+		m.superlist, cmd = m.superlist.Update(msg)
+
+		return m, cmd
+
 	case tea.KeyMsg:
 		if key.Matches(msg, keyMap.Quit) {
 			return m, tea.Quit
