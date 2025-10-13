@@ -139,18 +139,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case SelectAttachedSessionMsg:
 		var attached int
 
-	group:
 		for _, group := range m.superlist.GetItems() {
 			for _, item := range group.Items {
 				if item, ok := item.(*sessionItem); ok && item.IsAttached {
-					break group
+					m.superlist.SetCursor(attached)
+					return m, nil
 				}
 
 				attached += 1
 			}
 		}
 
-		m.superlist.SetCursor(attached)
+		m.superlist.SetCursor(0)
 		return m, nil
 
 	case superlist.SubmitMsg:
