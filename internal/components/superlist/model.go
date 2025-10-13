@@ -131,6 +131,12 @@ func (m Model) GetItems() []ItemGroup {
 	return m.groups
 }
 
+func (m *Model) updateScroll() {
+	previewInfo := m.preview()
+	m.ScrollUp(max(0, previewInfo.TopBound-previewInfo.CursorOffset))
+	m.ScrollDown(max(0, previewInfo.CursorOffset-previewInfo.BottomBound))
+}
+
 // TODO: find a way to refactor preview() and render()
 func (m Model) preview() previewInfo {
 	var (
@@ -211,19 +217,17 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 
+		m.updateScroll()
+
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keyMap.CursorUp):
 			m.CursorUp()
-
-			previewInfo := m.preview()
-			m.ScrollUp(max(0, previewInfo.TopBound-previewInfo.CursorOffset))
+			m.updateScroll()
 
 		case key.Matches(msg, m.keyMap.CursorDown):
 			m.CursorDown()
-
-			previewInfo := m.preview()
-			m.ScrollDown(max(0, previewInfo.CursorOffset-previewInfo.BottomBound))
+			m.updateScroll()
 
 		case m.Focused() && key.Matches(msg, m.keyMap.Submit):
 			m.input.Blur()
