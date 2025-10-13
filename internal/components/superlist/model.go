@@ -147,6 +147,10 @@ func (m Model) preview() previewInfo {
 	)
 
 	for _, g := range m.groups {
+		if len(g.Items) == 0 {
+			continue
+		}
+
 		// group name
 		currentRenderLen += 1
 
@@ -175,6 +179,10 @@ func (m Model) render() []string {
 	)
 
 	for _, g := range m.groups {
+		if len(g.Items) == 0 {
+			continue
+		}
+
 		lines = append(lines, groupNameStyle.Render(g.Name))
 
 		for _, i := range g.Items {
