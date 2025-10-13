@@ -29,12 +29,12 @@ type KeyMap struct {
 
 var keyMap = KeyMap{
 	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
-		key.WithHelp("↑ / k", "move up"),
+		key.WithKeys("up", "ctrl+p"),
+		key.WithHelp("↑ / ctrl+p", "move up"),
 	),
 	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
-		key.WithHelp("↓ / j", "move down"),
+		key.WithKeys("down", "ctrl+n"),
+		key.WithHelp("↓ / ctrl+n", "move down"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "esc", "ctrl+c"),
