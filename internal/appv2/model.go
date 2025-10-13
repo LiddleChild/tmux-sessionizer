@@ -54,7 +54,23 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			switch item := item.(type) {
 			case *sessionItem:
-				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(item.Value()), func(err error) tea.Msg {
+				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(item.Name), func(err error) tea.Msg {
+					return tea.Sequence(ErrCmd(err), tea.Quit)
+				})
+
+				return m, tea.Sequence(
+					execProcessCmd,
+					tea.Quit,
+				)
+
+			case *entryItem:
+				if !tmux.HasSession(item.Name) {
+					if err := tmux.NewDetachedSession(item.Name, item.Path); err != nil {
+						return m, tea.Sequence(ErrCmd(err), tea.Quit)
+					}
+				}
+
+				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(item.Name), func(err error) tea.Msg {
 					return tea.Sequence(ErrCmd(err), tea.Quit)
 				})
 
