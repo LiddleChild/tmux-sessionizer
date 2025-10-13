@@ -10,12 +10,10 @@ import (
 
 var _ superlist.InputItem = (*sessionItem)(nil)
 
-type sessionItem struct {
-	tmux.Session
-}
+type sessionItem tmux.Session
 
-func (i sessionItem) Name() string {
-	name := i.Session.Name
+func (i sessionItem) Label() string {
+	name := i.Name
 	if i.IsAttached {
 		name = fmt.Sprintf("%s (attached)", name)
 	}
@@ -32,9 +30,9 @@ func (i sessionItem) Style(style lipgloss.Style) lipgloss.Style {
 }
 
 func (i sessionItem) Value() string {
-	return i.Session.Name
+	return i.Name
 }
 
 func (i *sessionItem) SetValue(value string) {
-	i.Session.Name = value
+	i.Name = value
 }

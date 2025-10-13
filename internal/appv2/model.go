@@ -95,12 +95,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		sessionItems := make([]superlist.Item, 0, len(sessions))
 		for _, session := range sessions {
-			sessionItems = append(sessionItems, &sessionItem{session})
+			si := sessionItem(session)
+			sessionItems = append(sessionItems, &si)
 		}
 
 		entryItems := make([]superlist.Item, 0, len(config.WorkspaceEntries))
 		for _, entry := range config.WorkspaceEntries {
-			entryItems = append(entryItems, &entryItem{entry})
+			ei := entryItem(entry)
+			entryItems = append(entryItems, &ei)
 		}
 
 		items := []superlist.ItemGroup{

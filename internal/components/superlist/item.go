@@ -12,7 +12,7 @@ type InputItem interface {
 }
 
 type Item interface {
-	Name() string
+	Label() string
 	Style(lipgloss.Style) lipgloss.Style
 }
 

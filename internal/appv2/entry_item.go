@@ -5,12 +5,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type entryItem struct {
-	config.WorkspaceEntry
-}
+type entryItem config.WorkspaceEntry
 
-func (i entryItem) Name() string {
-	return string(i.WorkspaceEntry.Path)
+func (i entryItem) Label() string {
+	return string(i.Path)
 }
 
 func (i entryItem) Style(style lipgloss.Style) lipgloss.Style {

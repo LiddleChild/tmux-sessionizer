@@ -183,7 +183,7 @@ func (m Model) render() []string {
 				style = lipgloss.NewStyle()
 			}
 
-			itemName := i.Name()
+			itemName := i.Label()
 			if m.Focused() && m.cursor == idx {
 				itemName = m.input.View()
 			}
