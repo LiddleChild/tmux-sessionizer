@@ -1,11 +1,16 @@
 package appv2
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/LiddleChild/tmux-sessionpane/internal/config"
+	"github.com/charmbracelet/lipgloss"
+)
 
-type entryItem string
+type entryItem struct {
+	config.WorkspaceEntry
+}
 
 func (i entryItem) Name() string {
-	return string(i)
+	return string(i.WorkspaceEntry.Path)
 }
 
 func (i entryItem) Style(style lipgloss.Style) lipgloss.Style {

@@ -2,6 +2,7 @@ package appv2
 
 import (
 	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
+	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
 	"github.com/charmbracelet/bubbles/key"
@@ -97,10 +98,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			sessionItems = append(sessionItems, &sessionItem{session})
 		}
 
-		entryItems := []superlist.Item{
-			entryItem("~/.config/"),
-			entryItem("~/dotfiles/"),
-			entryItem("~/Documents/Projects/"),
+		entryItems := make([]superlist.Item, 0, len(config.WorkspaceEntries))
+		for _, entry := range config.WorkspaceEntries {
+			entryItems = append(entryItems, &entryItem{entry})
 		}
 
 		items := []superlist.ItemGroup{
@@ -124,7 +124,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	group:
 		for _, group := range m.superlist.GetItems() {
 			for _, item := range group.Items {
-				log.Dump(log.LogLevelDebug, item)
 				if item, ok := item.(*sessionItem); ok && item.IsAttached {
 					break group
 				}
