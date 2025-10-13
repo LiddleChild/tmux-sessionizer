@@ -1,18 +1,23 @@
 package appv2
 
 import (
+	"fmt"
+
 	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
 	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var _ tea.Model = (*Model)(nil)
 
 type Model struct {
 	superlist superlist.Model
+	help      help.Model
 }
 
 func New() (Model, error) {
@@ -27,7 +32,23 @@ func New() (Model, error) {
 
 	return Model{
 		superlist: superlist,
+		help:      help.New(),
 	}, nil
+}
+
+func (m Model) renderTopBar() string {
+	var help string
+	if m.superlist.Focused() {
+		help = m.help.FullHelpView(focusedKeyMap.FullHelp()) + "\n"
+	} else {
+		help = m.help.FullHelpView(keyMap.FullHelp())
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Top,
+		fmt.Sprintf("%s %s", config.AppName, config.AppVersion),
+		help,
+		"",
+	)
 }
 
 func (m Model) Init() tea.Cmd {
@@ -39,8 +60,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		helpHeight := lipgloss.Height(m.renderTopBar())
+
 		var cmd tea.Cmd
-		m.superlist, cmd = m.superlist.Update(msg)
+		m.superlist, cmd = m.superlist.Update(tea.WindowSizeMsg{
+			Width:  msg.Width,
+			Height: msg.Height - helpHeight,
+		})
 
 		return m, cmd
 
@@ -166,5 +192,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	return m.superlist.View()
+	return lipgloss.JoinVertical(lipgloss.Top,
+		m.renderTopBar(),
+		m.superlist.View(),
+	)
 }

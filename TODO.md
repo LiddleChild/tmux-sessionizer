@@ -1,1 +1,1 @@
-- combine tmux-sessionpane and space
+- fuzzyfind session and workspaces
