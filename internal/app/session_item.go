@@ -1,4 +1,4 @@
-package appv2
+package app
 
 import (
 	"fmt"

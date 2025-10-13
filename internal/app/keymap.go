@@ -6,10 +6,10 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 )
 
-var _ help.KeyMap = (*keyMap)(nil)
+var _ help.KeyMap = (*KeyMap)(nil)
 
-func (k keyMap) ShortHelp() []key.Binding { return []key.Binding{} }
-func (k keyMap) FullHelp() [][]key.Binding {
+func (k KeyMap) ShortHelp() []key.Binding { return []key.Binding{} }
+func (k KeyMap) FullHelp() [][]key.Binding {
 	return utils.Transpose(
 		[][]key.Binding{
 			{k.Up, k.Down, k.Quit},
@@ -18,7 +18,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 	)
 }
 
-type keyMap struct {
+type KeyMap struct {
 	Up     key.Binding
 	Down   key.Binding
 	Quit   key.Binding
@@ -27,7 +27,7 @@ type keyMap struct {
 	Delete key.Binding
 }
 
-var keymap = keyMap{
+var keyMap = KeyMap{
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
 		key.WithHelp("↑ / k", "move up"),
@@ -54,10 +54,10 @@ var keymap = keyMap{
 	),
 }
 
-var _ help.KeyMap = (*focusedKeyMap)(nil)
+var _ help.KeyMap = (*FocusedKeyMap)(nil)
 
-func (k focusedKeyMap) ShortHelp() []key.Binding { return []key.Binding{} }
-func (k focusedKeyMap) FullHelp() [][]key.Binding {
+func (k FocusedKeyMap) ShortHelp() []key.Binding { return []key.Binding{} }
+func (k FocusedKeyMap) FullHelp() [][]key.Binding {
 	return utils.Transpose(
 		[][]key.Binding{
 			{k.Submit, k.Cancel},
@@ -65,12 +65,12 @@ func (k focusedKeyMap) FullHelp() [][]key.Binding {
 	)
 }
 
-type focusedKeyMap struct {
+type FocusedKeyMap struct {
 	Submit key.Binding
 	Cancel key.Binding
 }
 
-var focusedKeymap = focusedKeyMap{
+var focusedKeyMap = FocusedKeyMap{
 	Submit: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "rename"),

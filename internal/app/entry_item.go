@@ -1,4 +1,4 @@
-package appv2
+package app
 
 import (
 	"github.com/LiddleChild/tmux-sessionpane/internal/config"
