@@ -88,9 +88,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 
-				if m.superlist.GetCursor() == len(m.superlist.GetItems())-1 {
-					m.superlist.CursorUp()
-				}
+				m.superlist.CursorUp()
 
 				if err := tmux.DeleteSession(session.Value()); err != nil {
 					return m, ErrCmd(err)
