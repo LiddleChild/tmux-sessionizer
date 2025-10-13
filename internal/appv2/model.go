@@ -39,16 +39,17 @@ func New() (Model, error) {
 func (m Model) renderTopBar() string {
 	var help string
 	if m.superlist.Focused() {
-		help = m.help.FullHelpView(focusedKeyMap.FullHelp()) + "\n"
+		help = m.help.FullHelpView(focusedKeyMap.FullHelp())
 	} else {
 		help = m.help.FullHelpView(keyMap.FullHelp())
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Top,
-		fmt.Sprintf("%s %s", config.AppName, config.AppVersion),
-		help,
-		"",
-	)
+	return lipgloss.NewStyle().
+		Height(4).
+		Render(lipgloss.JoinVertical(lipgloss.Top,
+			fmt.Sprintf("%s %s", config.AppName, config.AppVersion),
+			help,
+		))
 }
 
 func (m Model) Init() tea.Cmd {
