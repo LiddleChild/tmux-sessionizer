@@ -1,7 +1,6 @@
 package superlist
 
 import (
-	"github.com/LiddleChild/tmux-sessionpane/internal/log"
 	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -75,9 +74,6 @@ func (m Model) GetSelectedItem() Item {
 		idx -= len(m.groups[groupIdx].Items)
 		groupIdx += 1
 	}
-
-	log.Dump(log.LogLevelDebug, groupIdx)
-	log.Dump(log.LogLevelDebug, idx)
 
 	return m.groups[groupIdx].Items[idx]
 }
