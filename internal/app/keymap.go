@@ -37,20 +37,20 @@ var keyMap = KeyMap{
 		key.WithHelp("↓ / ctrl+n", "move down"),
 	),
 	Quit: key.NewBinding(
-		key.WithKeys("q", "esc", "ctrl+c"),
-		key.WithHelp("q / esc / ctrl+c", "quit"),
+		key.WithKeys("esc", "ctrl+c"),
+		key.WithHelp("esc / ctrl+c", "quit"),
 	),
 	Select: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "goto"),
 	),
 	Rename: key.NewBinding(
-		key.WithKeys("r"),
-		key.WithHelp("r", "rename"),
+		key.WithKeys("ctrl+r"),
+		key.WithHelp("ctrl+r", "rename"),
 	),
 	Delete: key.NewBinding(
-		key.WithKeys("d"),
-		key.WithHelp("d", "delete"),
+		key.WithKeys("ctrl+d"),
+		key.WithHelp("ctrl+d", "delete"),
 	),
 }
 
