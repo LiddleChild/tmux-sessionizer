@@ -26,6 +26,7 @@ func New() (Model, error) {
 		SetKeyMap(superlist.KeyMap{
 			CursorUp:   keyMap.Up,
 			CursorDown: keyMap.Down,
+			FocusItem:  keyMap.Rename,
 			Submit:     focusedKeyMap.Submit,
 			Cancel:     focusedKeyMap.Cancel,
 		})
@@ -123,9 +124,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				return m, ListTmuxSessionCmd
 			}
-
-		case !m.superlist.Focused() && key.Matches(msg, keyMap.Rename):
-			return m, m.superlist.Focus()
 		}
 
 	case ListTmuxSessionMsg:
@@ -157,9 +155,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			},
 		}
 
-		m.superlist.SetItems(items)
-
-		return m, nil
+		return m, m.superlist.SetItems(items)
 
 	case SelectAttachedSessionMsg:
 		var attached int

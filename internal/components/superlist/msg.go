@@ -15,3 +15,15 @@ func SubmitCmd(oldValue, newValue string) tea.Cmd {
 		}
 	}
 }
+
+type FilterMsg struct {
+	Value string
+}
+
+func FilterCmd(value string) tea.Cmd {
+	return func() tea.Msg {
+		return FilterMsg{
+			Value: value,
+		}
+	}
+}

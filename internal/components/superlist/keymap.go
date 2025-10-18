@@ -7,4 +7,5 @@ type KeyMap struct {
 	CursorDown key.Binding
 	Submit     key.Binding
 	Cancel     key.Binding
+	FocusItem  key.Binding
 }
