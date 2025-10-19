@@ -100,23 +100,35 @@ func (m Model) renderList() []string {
 		lines = append(lines, groupNameStyle.Render(g.Name))
 
 		for _, i := range g.Items {
-			var style lipgloss.Style
-			if m.cursor == idx {
+			var (
+				style      lipgloss.Style
+				isSelected = m.cursor == idx
+			)
+			if isSelected {
 				style = hoveredItemStyle
 			} else {
 				style = lipgloss.NewStyle()
 			}
 
 			var itemName string
-			if m.FocusedComponent() == FocusedComponentItem && m.cursor == idx {
+			if m.FocusedComponent() == FocusedComponentItem && isSelected {
 				itemName = m.input.View()
 			} else {
 				itemName = m.renderItem(i, i.Style(style))
 			}
 
+			style = i.Style(style).
+				BorderStyle(lipgloss.OuterHalfBlockBorder()).
+				BorderBackground(style.GetBackground()).
+				BorderForeground(style.GetForeground()).
+				BorderLeft(isSelected)
+
+			style = style.
+				PaddingLeft(2 - style.GetHorizontalFrameSize())
+
 			lines = append(lines,
-				i.Style(style).
-					Width(m.width).
+				style.
+					Width(m.width-style.GetHorizontalFrameSize()).
 					Render(itemName),
 			)
 
