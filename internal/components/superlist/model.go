@@ -199,13 +199,18 @@ func (m *Model) filterItems(filter string) {
 		return
 	}
 
-	filteredGroups := make([]ItemGroup, 0, len(m.groups))
+	var (
+		filteredGroups = make([]ItemGroup, 0, len(m.groups))
+
+		cursor   = 0
+		topScore = 0
+		idx      = 0
+	)
 
 	for _, group := range m.groups {
 		filteredItems := make([]filteredItem, 0, len(group.Items))
 		for _, item := range group.Items {
 			score, matches := fuzzyfinder.Match(item.Label(), filter)
-
 			if score*2 >= len(filter)*fuzzyfinder.Matched {
 				filteredItems = append(filteredItems, filteredItem{
 					item:    item,
@@ -224,16 +229,24 @@ func (m *Model) filterItems(filter string) {
 		})
 
 		items := make([]Item, 0, len(filteredItems))
-		for _, fi := range filteredItems {
-			items = append(items, &fi)
+		for _, item := range filteredItems {
+			if item.score > topScore {
+				topScore = item.score
+				cursor = idx
+			}
+
+			idx += 1
+			items = append(items, &item)
 		}
 
-		group.Items = items
-		filteredGroups = append(filteredGroups, group)
+		filteredGroups = append(filteredGroups, ItemGroup{
+			Name:  group.Name,
+			Items: items,
+		})
 	}
 
 	m.filteredGroups = filteredGroups
-	m.SetCursor(0)
+	m.SetCursor(cursor)
 }
 
 func (m *Model) updateScroll() {
