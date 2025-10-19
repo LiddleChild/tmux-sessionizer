@@ -1,10 +1,11 @@
-package listinput
+package superlist
 
 import "github.com/charmbracelet/bubbles/key"
 
 type KeyMap struct {
-	CursorDown key.Binding
 	CursorUp   key.Binding
+	CursorDown key.Binding
 	Submit     key.Binding
 	Cancel     key.Binding
+	FocusItem  key.Binding
 }

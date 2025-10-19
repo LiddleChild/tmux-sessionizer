@@ -88,3 +88,29 @@ func DeleteSession(name string) error {
 
 	return nil
 }
+
+func HasSession(name string) bool {
+	cmd := exec.Command("tmux", "has-session", "-t", name)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+
+	return cmd.ProcessState.ExitCode() == 0
+}
+
+func NewDetachedSession(name, workDir string) error {
+	cmd := exec.Command("tmux", "new-session", "-d", "-s", name, "-c", workDir)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	return nil
+}
