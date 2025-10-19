@@ -231,7 +231,7 @@ func (m *Model) filterItems(filter string) {
 		for _, item := range group.Items {
 			score, matches := fuzzyfinder.Match(item.Label(), filter)
 
-			if score > 0 {
+			if score*2 >= len(filter)*fuzzyfinder.Matched {
 				filteredItems = append(filteredItems, filteredItem{
 					item:    item,
 					matches: matches,

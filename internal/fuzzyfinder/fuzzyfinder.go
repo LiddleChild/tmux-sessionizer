@@ -6,17 +6,17 @@ import (
 	"github.com/LiddleChild/tmux-sessionpane/internal/types"
 )
 
+const (
+	Matched    = 5
+	Mismatched = -3
+	Gap        = -1
+)
+
 func Match(str, pattern string) (int, []types.Pair[int]) {
 	return smithWaterman(str, pattern)
 }
 
 func smithWaterman(str, pattern string) (int, []types.Pair[int]) {
-	const (
-		Matched    = 5
-		Mismatched = -3
-		Gap        = -1
-	)
-
 	var (
 		strLen     = len(str)
 		patternLen = len(pattern)
@@ -75,10 +75,6 @@ func smithWaterman(str, pattern string) (int, []types.Pair[int]) {
 		} else if scores[mxi][mxj-1] == localMx {
 			mxj -= 1
 		}
-	}
-
-	if score*2 < patternLen*Matched {
-		return -1, []types.Pair[int]{}
 	}
 
 	return score, toRange(indices)
