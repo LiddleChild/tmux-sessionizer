@@ -1,9 +1,12 @@
 package app
 
 import (
+	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
 	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/charmbracelet/lipgloss"
 )
+
+var _ superlist.Item = (*entryItem)(nil)
 
 type entryItem config.WorkspaceEntry
 
