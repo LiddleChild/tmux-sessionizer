@@ -1,7 +1,6 @@
 package superlist
 
 import (
-	"github.com/LiddleChild/tmux-sessionpane/internal/types"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -9,8 +8,7 @@ var _ Item = (*filteredItem)(nil)
 
 type filteredItem struct {
 	item    Item
-	score   int
-	matches []types.Pair[int]
+	matches []int
 }
 
 func (item filteredItem) Label() string {

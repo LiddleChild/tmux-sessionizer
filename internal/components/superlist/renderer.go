@@ -30,24 +30,21 @@ func (m Model) renderItem(item Item, style lipgloss.Style) string {
 	switch item := item.(type) {
 	case *filteredItem:
 		var (
-			builder   strings.Builder
-			lastIndex int
+			builder      strings.Builder
+			matchesIndex int
 		)
 
-		for _, match := range item.matches {
-			var (
-				start = match.X
-				end   = match.Y + 1
-			)
+		for i, r := range item.Label() {
+			if matchesIndex < len(item.matches) && i == item.matches[matchesIndex] {
+				builder.WriteString(style.
+					Foreground(colors.Yellow).
+					Render(string(r)))
 
-			builder.WriteString(style.Render(item.Label()[lastIndex:start]))
-			builder.WriteString(style.
-				Foreground(colors.Yellow).
-				Render(item.Label()[start:end]))
-			lastIndex = end
+				matchesIndex += 1
+			} else {
+				builder.WriteString(style.Render(string(r)))
+			}
 		}
-
-		builder.WriteString(style.Render(item.Label()[lastIndex:]))
 
 		return builder.String()
 

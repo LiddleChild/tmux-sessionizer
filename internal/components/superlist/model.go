@@ -2,7 +2,7 @@ package superlist
 
 import (
 	"iter"
-	"slices"
+	"math"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/fuzzyfinder"
 	"github.com/charmbracelet/bubbles/cursor"
@@ -37,6 +37,8 @@ type Model struct {
 	filter textinput.Model
 
 	focusedComponent FocusedComponent
+
+	fuzzyfinder fuzzyfinder.Algorithm
 }
 
 func New(groups []ItemGroup) Model {
@@ -64,6 +66,7 @@ func New(groups []ItemGroup) Model {
 		input:            input,
 		filter:           filter,
 		focusedComponent: FocusedComponentNone,
+		fuzzyfinder:      fuzzyfinder.NewForrestTheWoods(),
 	}
 
 	m.FocusComponent(FocusedComponentFilter)
@@ -193,8 +196,8 @@ func (m *Model) SetItems(items []ItemGroup) {
 	m.filterItems(m.filter.Value())
 }
 
-func (m *Model) filterItems(filter string) {
-	if len(filter) == 0 {
+func (m *Model) filterItems(pattern string) {
+	if len(pattern) == 0 {
 		m.filteredGroups = m.groups
 		return
 	}
@@ -202,41 +205,27 @@ func (m *Model) filterItems(filter string) {
 	var (
 		filteredGroups = make([]ItemGroup, 0, len(m.groups))
 
+		topScore = math.MinInt32
 		cursor   = 0
-		topScore = 0
 		idx      = 0
 	)
 
 	for _, group := range m.groups {
-		filteredItems := make([]filteredItem, 0, len(group.Items))
-		for _, item := range group.Items {
-			score, matches := fuzzyfinder.Match(item.Label(), filter)
-			if score*2 >= len(filter)*fuzzyfinder.Matched {
-				filteredItems = append(filteredItems, filteredItem{
-					item:    item,
-					matches: matches,
-					score:   score,
-				})
-			}
-		}
+		matches := m.fuzzyfinder.Find(group, pattern)
 
-		slices.SortFunc(filteredItems, func(a, b filteredItem) int {
-			if a.score == b.score {
-				return len(a.item.Label()) - len(b.item.Label())
-			} else {
-				return b.score - a.score
-			}
-		})
-
-		items := make([]Item, 0, len(filteredItems))
-		for _, item := range filteredItems {
-			if item.score > topScore {
-				topScore = item.score
+		items := make([]Item, 0, len(matches))
+		for _, match := range matches {
+			if match.Score > topScore {
+				topScore = match.Score
 				cursor = idx
 			}
 
+			items = append(items, &filteredItem{
+				item:    group.Items[match.Index],
+				matches: match.MatchedIndices,
+			})
+
 			idx += 1
-			items = append(items, &item)
 		}
 
 		filteredGroups = append(filteredGroups, ItemGroup{

@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.7
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/davecgh/go-spew v1.1.1
+	github.com/sahilm/fuzzy v0.1.1
 )
 
 require (
