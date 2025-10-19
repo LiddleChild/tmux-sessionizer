@@ -13,7 +13,7 @@ import (
 
 const (
 	AppName    = "tmux-sessionizer"
-	AppVersion = "v0.2.2"
+	AppVersion = "v1.0.0"
 )
 
 var (
