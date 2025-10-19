@@ -77,7 +77,7 @@ func New(groups []ItemGroup) Model {
 		filter:         filter,
 	}
 
-	m.SetFocusedMode(FocusedModeFilter)
+	m.Focus(FocusedModeFilter)
 	m.SetItems(groups)
 
 	return m
@@ -92,27 +92,6 @@ func (m Model) Length() int {
 	return accu
 }
 
-func (m Model) GetSelectedItem() Item {
-	var (
-		groups   = m.filteredGroups
-		groupIdx = 0
-		idx      = m.cursor
-	)
-
-	for idx >= len(groups[groupIdx].Items) {
-		idx -= len(groups[groupIdx].Items)
-		groupIdx += 1
-	}
-
-	switch item := groups[groupIdx].Items[idx].(type) {
-	case *filteredItem:
-		return item.item
-
-	default:
-		return item
-	}
-}
-
 func (m Model) SetKeyMap(keyMap KeyMap) Model {
 	m.keyMap = keyMap
 	return m
@@ -122,7 +101,7 @@ func (m Model) Focused() bool {
 	return m.input.Focused()
 }
 
-func (m *Model) SetFocusedMode(mode FocusedMode) tea.Cmd {
+func (m *Model) Focus(mode FocusedMode) tea.Cmd {
 	m.filter.Blur()
 	m.input.Blur()
 
@@ -140,6 +119,10 @@ func (m *Model) SetFocusedMode(mode FocusedMode) tea.Cmd {
 	}
 
 	return nil
+}
+
+func (m Model) GetCursor() int {
+	return m.cursor
 }
 
 func (m *Model) SetCursor(cursor int) {
@@ -162,17 +145,33 @@ func (m *Model) ScrollDown(amount int) {
 	m.yOffset += amount
 }
 
-func (m Model) GetCursor() int {
-	return m.cursor
+func (m Model) GetSelectedItem() Item {
+	var (
+		groups   = m.filteredGroups
+		groupIdx = 0
+		idx      = m.cursor
+	)
+
+	for idx >= len(groups[groupIdx].Items) {
+		idx -= len(groups[groupIdx].Items)
+		groupIdx += 1
+	}
+
+	switch item := groups[groupIdx].Items[idx].(type) {
+	case *filteredItem:
+		return item.item
+	default:
+		return item
+	}
+}
+
+func (m Model) GetItems() []ItemGroup {
+	return m.filteredGroups
 }
 
 func (m *Model) SetItems(items []ItemGroup) tea.Cmd {
 	m.groups = items
 	return FilterCmd(m.filter.Value())
-}
-
-func (m Model) GetItems() []ItemGroup {
-	return m.filteredGroups
 }
 
 func (m Model) renderItem(item Item, style lipgloss.Style) string {
@@ -362,7 +361,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.updateScroll()
 
 		case m.Focused() && key.Matches(msg, m.keyMap.Submit):
-			m.SetFocusedMode(FocusedModeFilter)
+			m.Focus(FocusedModeFilter)
 
 			item := m.GetSelectedItem().(InputItem)
 
@@ -370,10 +369,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, SubmitCmd(item.Value(), m.input.Value())
 
 		case m.Focused() && key.Matches(msg, m.keyMap.Cancel):
-			m.SetFocusedMode(FocusedModeFilter)
+			m.Focus(FocusedModeFilter)
 
 		case !m.Focused() && key.Matches(msg, m.keyMap.FocusItem):
-			return m, m.SetFocusedMode(FocusedModeItem)
+			return m, m.Focus(FocusedModeItem)
 		}
 	}
 
