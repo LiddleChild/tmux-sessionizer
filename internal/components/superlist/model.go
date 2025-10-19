@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/fuzzyfinder"
-	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -19,20 +18,6 @@ const (
 	FocusedModeItem   FocusedMode = "Item"
 	FocusedModeFilter FocusedMode = "Filter"
 )
-
-type previewInfo struct {
-	// first line in bound
-	TopBound int
-
-	// last line in bound
-	BottomBound int
-
-	// global cursor offset
-	CursorOffset int
-
-	// rendering height
-	Height int
-}
 
 type Model struct {
 	groups         []ItemGroup
@@ -253,82 +238,6 @@ func (m *Model) updateScroll() {
 	m.ScrollDown(max(0, previewInfo.CursorOffset-previewInfo.BottomBound))
 }
 
-// TODO: find a way to refactor preview() and render()
-func (m Model) preview() previewInfo {
-	var (
-		info previewInfo
-
-		itemIdx          = 0
-		currentRenderLen = 0
-	)
-
-	for _, g := range m.filteredGroups {
-		if len(g.Items) == 0 {
-			continue
-		}
-
-		// group name
-		currentRenderLen += 1
-
-		for range g.Items {
-			if m.cursor == itemIdx {
-				info.CursorOffset = currentRenderLen
-			}
-
-			// item
-			currentRenderLen += 1
-			itemIdx += 1
-		}
-	}
-
-	info.Height = currentRenderLen
-	info.TopBound = utils.Clamp(m.yOffset, 0, currentRenderLen)
-	info.BottomBound = utils.Clamp(m.yOffset+m.listHeight-1, 0, currentRenderLen)
-
-	return info
-}
-
-func (m Model) render() []string {
-	var (
-		idx   = 0
-		lines = []string{}
-	)
-
-	for _, g := range m.filteredGroups {
-		if len(g.Items) == 0 {
-			continue
-		}
-
-		lines = append(lines, groupNameStyle.Render(g.Name))
-
-		for _, i := range g.Items {
-			var style lipgloss.Style
-			if m.cursor == idx {
-				style = hoveredItemStyle
-			} else {
-				style = lipgloss.NewStyle()
-			}
-
-			var itemName string
-			if m.Focused() && m.cursor == idx {
-				itemName = m.input.View()
-			} else {
-				itemName = m.renderItem(i, i.Style(style))
-			}
-
-			lines = append(lines,
-				i.Style(style).
-					Width(m.width).
-					Render(itemName),
-			)
-
-			idx += 1
-		}
-	}
-
-	return lines
-}
-
 func (m Model) Init() tea.Cmd {
 	return nil
 }
@@ -346,7 +255,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-		m.listHeight = msg.Height - 1
+		m.listHeight = msg.Height - lipgloss.Height(m.renderFilter())
 
 		m.updateScroll()
 
