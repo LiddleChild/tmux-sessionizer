@@ -39,7 +39,7 @@ func New() (Model, error) {
 
 func (m Model) renderTopBar() string {
 	var help string
-	if m.superlist.Focused() {
+	if m.superlist.FocusedComponent() == superlist.FocusedComponentItem {
 		help = m.help.FullHelpView(focusedKeyMap.FullHelp())
 	} else {
 		help = m.help.FullHelpView(keyMap.FullHelp())
@@ -74,13 +74,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case !m.superlist.Focused() && key.Matches(msg, keyMap.Quit):
+		case m.superlist.FocusedComponent() == superlist.FocusedComponentFilter && key.Matches(msg, keyMap.Quit):
 			return m, tea.Quit
 
-		case !m.superlist.Focused() && key.Matches(msg, keyMap.Select):
-			item := m.superlist.GetSelectedItem()
-
-			switch item := item.(type) {
+		case m.superlist.FocusedComponent() == superlist.FocusedComponentFilter && key.Matches(msg, keyMap.Select):
+			switch item := m.superlist.GetSelectedItem().(type) {
 			case *sessionItem:
 				execProcessCmd := tea.ExecProcess(tmux.AttachSessionCommand(item.Name), func(err error) tea.Msg {
 					return tea.Sequence(ErrCmd(err), tea.Quit)
@@ -108,7 +106,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				)
 			}
 
-		case !m.superlist.Focused() && key.Matches(msg, keyMap.Delete):
+		case m.superlist.FocusedComponent() == superlist.FocusedComponentFilter && key.Matches(msg, keyMap.Delete):
 			item := m.superlist.GetSelectedItem()
 
 			if session, ok := item.(*sessionItem); ok {

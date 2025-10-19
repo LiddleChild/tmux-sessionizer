@@ -13,11 +13,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type FocusedMode string
+type FocusedComponent string
 
 const (
-	FocusedModeItem   FocusedMode = "Item"
-	FocusedModeFilter FocusedMode = "Filter"
+	FocusedComponentNone   FocusedComponent = "None"
+	FocusedComponentItem   FocusedComponent = "Item"
+	FocusedComponentFilter FocusedComponent = "Filter"
 )
 
 type Model struct {
@@ -35,6 +36,8 @@ type Model struct {
 
 	input  textinput.Model
 	filter textinput.Model
+
+	focusedComponent FocusedComponent
 }
 
 func New(groups []ItemGroup) Model {
@@ -51,19 +54,20 @@ func New(groups []ItemGroup) Model {
 	filter.Cursor.SetMode(cursor.CursorStatic)
 
 	m := Model{
-		groups:         []ItemGroup{},
-		filteredGroups: []ItemGroup{},
-		cursor:         0,
-		width:          0,
-		height:         0,
-		listHeight:     0,
-		yOffset:        0,
-		keyMap:         KeyMap{},
-		input:          input,
-		filter:         filter,
+		groups:           []ItemGroup{},
+		filteredGroups:   []ItemGroup{},
+		cursor:           0,
+		width:            0,
+		height:           0,
+		listHeight:       0,
+		yOffset:          0,
+		keyMap:           KeyMap{},
+		input:            input,
+		filter:           filter,
+		focusedComponent: FocusedComponentNone,
 	}
 
-	m.Focus(FocusedModeFilter)
+	m.FocusComponent(FocusedComponentFilter)
 	m.SetItems(groups)
 
 	return m
@@ -82,19 +86,21 @@ func (m Model) SetKeyMap(keyMap KeyMap) Model {
 	return m
 }
 
-func (m Model) Focused() bool {
-	return m.input.Focused()
+func (m Model) FocusedComponent() FocusedComponent {
+	return m.focusedComponent
 }
 
-func (m *Model) Focus(mode FocusedMode) tea.Cmd {
+func (m *Model) FocusComponent(component FocusedComponent) tea.Cmd {
 	m.filter.Blur()
 	m.input.Blur()
 
-	switch mode {
-	case FocusedModeFilter:
+	m.focusedComponent = component
+
+	switch component {
+	case FocusedComponentFilter:
 		return m.filter.Focus()
 
-	case FocusedModeItem:
+	case FocusedComponentItem:
 		item := m.GetSelectedItem()
 		if item, ok := item.(InputItem); ok {
 			m.input.SetValue(item.Value())
@@ -298,19 +304,19 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.CursorDown()
 			m.updateScroll()
 
-		case m.Focused() && key.Matches(msg, m.keyMap.Submit):
-			m.Focus(FocusedModeFilter)
+		case m.FocusedComponent() == FocusedComponentItem && key.Matches(msg, m.keyMap.Submit):
+			m.FocusComponent(FocusedComponentFilter)
 
 			item := m.GetSelectedItem().(InputItem)
 
 			item.SetValue(m.input.Value())
 			return m, SubmitCmd(item.Value(), m.input.Value())
 
-		case m.Focused() && key.Matches(msg, m.keyMap.Cancel):
-			m.Focus(FocusedModeFilter)
+		case m.FocusedComponent() == FocusedComponentItem && key.Matches(msg, m.keyMap.Cancel):
+			m.FocusComponent(FocusedComponentFilter)
 
-		case !m.Focused() && key.Matches(msg, m.keyMap.FocusItem):
-			return m, m.Focus(FocusedModeItem)
+		case m.FocusedComponent() == FocusedComponentFilter && key.Matches(msg, m.keyMap.FocusItem):
+			return m, m.FocusComponent(FocusedComponentItem)
 		}
 	}
 

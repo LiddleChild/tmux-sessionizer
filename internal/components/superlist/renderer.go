@@ -76,7 +76,7 @@ func (m Model) renderList() []string {
 			}
 
 			var itemName string
-			if m.Focused() && m.cursor == idx {
+			if m.FocusedComponent() == FocusedComponentItem && m.cursor == idx {
 				itemName = m.input.View()
 			} else {
 				itemName = m.renderItem(i, i.Style(style))
