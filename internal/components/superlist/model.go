@@ -1,6 +1,7 @@
 package superlist
 
 import (
+	"iter"
 	"slices"
 	"strings"
 
@@ -69,12 +70,11 @@ func New(groups []ItemGroup) Model {
 }
 
 func (m Model) Length() int {
-	var accu int
-	for _, g := range m.filteredGroups {
-		accu += len(g.Items)
+	var length int
+	for _, g := range m.GetGroupIter() {
+		length += len(g.Items)
 	}
-
-	return accu
+	return length
 }
 
 func (m Model) SetKeyMap(keyMap KeyMap) Model {
@@ -150,13 +150,42 @@ func (m Model) GetSelectedItem() Item {
 	}
 }
 
-func (m Model) GetItems() []ItemGroup {
-	return m.filteredGroups
+func (m Model) GetGroupIter() iter.Seq2[int, ItemGroup] {
+	return func(yield func(int, ItemGroup) bool) {
+		for i, group := range m.filteredGroups {
+			if len(group.Items) == 0 {
+				continue
+			}
+
+			if !yield(i, group) {
+				return
+			}
+		}
+	}
 }
 
-func (m *Model) SetItems(items []ItemGroup) tea.Cmd {
+func (m Model) GetItemIter() iter.Seq2[int, Item] {
+	return func(yield func(int, Item) bool) {
+		var idx int
+		for _, group := range m.GetGroupIter() {
+			for _, item := range group.Items {
+				if filteredItem, ok := item.(*filteredItem); ok {
+					item = filteredItem.item
+				}
+
+				if !yield(idx, item) {
+					return
+				}
+
+				idx += 1
+			}
+		}
+	}
+}
+
+func (m *Model) SetItems(items []ItemGroup) {
 	m.groups = items
-	return FilterCmd(m.filter.Value())
+	m.filterItems(m.filter.Value())
 }
 
 func (m Model) renderItem(item Item, style lipgloss.Style) string {
@@ -233,7 +262,7 @@ func (m *Model) filterItems(filter string) {
 }
 
 func (m *Model) updateScroll() {
-	previewInfo := m.preview()
+	previewInfo := m.previewList()
 	m.ScrollUp(max(0, previewInfo.TopBound-previewInfo.CursorOffset))
 	m.ScrollDown(max(0, previewInfo.CursorOffset-previewInfo.BottomBound))
 }
@@ -301,13 +330,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	lines := m.render()
+	lines := m.renderList()
 
-	previewInfo := m.preview()
+	previewInfo := m.previewList()
 	lines = lines[previewInfo.TopBound:min(len(lines), previewInfo.BottomBound+1)]
-
-	listContent := lipgloss.JoinVertical(lipgloss.Top, lines...)
-	listStyle := lipgloss.NewStyle()
 
 	style := lipgloss.NewStyle().
 		Height(m.height).
@@ -317,8 +343,8 @@ func (m Model) View() string {
 
 	return style.Render(
 		lipgloss.JoinVertical(lipgloss.Top,
-			m.filter.View(),
-			listStyle.Render(listContent),
+			m.renderFilter(),
+			lipgloss.JoinVertical(lipgloss.Top, lines...),
 		),
 	)
 }

@@ -23,8 +23,8 @@ func (m Model) renderFilter() string {
 	return m.filter.View()
 }
 
-// TODO: find a way to refactor preview() and render()
-func (m Model) preview() previewInfo {
+// TODO: find a way to refactor previewList() and render()
+func (m Model) previewList() previewInfo {
 	var (
 		info previewInfo
 
@@ -32,11 +32,7 @@ func (m Model) preview() previewInfo {
 		currentRenderLen = 0
 	)
 
-	for _, g := range m.filteredGroups {
-		if len(g.Items) == 0 {
-			continue
-		}
-
+	for _, g := range m.GetGroupIter() {
 		// group name
 		currentRenderLen += 1
 
@@ -58,7 +54,7 @@ func (m Model) preview() previewInfo {
 	return info
 }
 
-func (m Model) render() []string {
+func (m Model) renderList() []string {
 	var (
 		idx   = 0
 		lines = []string{}

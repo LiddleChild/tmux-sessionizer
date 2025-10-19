@@ -155,24 +155,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			},
 		}
 
-		return m, m.superlist.SetItems(items)
+		m.superlist.SetItems(items)
+
+		return m, nil
 
 	case SelectAttachedSessionMsg:
-		var attached int
-
-		for _, group := range m.superlist.GetItems() {
-			for _, item := range group.Items {
-				if item, ok := item.(*sessionItem); ok && item.IsAttached {
-					m.superlist.SetCursor(attached)
-					return m, nil
-				}
-
-				attached += 1
+		for i, item := range m.superlist.GetItemIter() {
+			if item, ok := item.(*sessionItem); ok && item.IsAttached {
+				m.superlist.SetCursor(i)
+				return m, nil
 			}
 		}
 
 		m.superlist.SetCursor(0)
 		return m, nil
+
+	case superlist.FilterMsg:
+		var cmd tea.Cmd
+		m.superlist, cmd = m.superlist.Update(msg)
+		return m, cmd
 
 	case superlist.SubmitMsg:
 		if err := tmux.RenameSession(msg.OldValue, msg.NewValue); err != nil {
