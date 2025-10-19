@@ -247,6 +247,7 @@ func (m *Model) filterItems(filter string) {
 
 	m.filteredGroups = filteredGroups
 	m.SetCursor(cursor)
+	m.updateScroll()
 }
 
 func (m *Model) updateScroll() {
