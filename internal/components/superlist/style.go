@@ -1,18 +1,21 @@
 package superlist
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/LiddleChild/tmux-sessionpane/internal/colors"
+	"github.com/charmbracelet/lipgloss"
+)
 
 var (
 	groupNameStyle = lipgloss.NewStyle().
 			Italic(true).
-			Foreground(lipgloss.Color("8"))
+			Foreground(colors.BrightBlack)
 
 	hoveredItemStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("6")).
-				Background(lipgloss.Color("8")).
+				Foreground(colors.Cyan).
+				Background(colors.BrightBlack).
 				Bold(true)
 
 	filterPromptStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("6")).
+				Foreground(colors.BrightBlack).
 				Bold(true)
 )

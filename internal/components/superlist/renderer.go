@@ -3,6 +3,7 @@ package superlist
 import (
 	"strings"
 
+	"github.com/LiddleChild/tmux-sessionpane/internal/colors"
 	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -41,7 +42,7 @@ func (m Model) renderItem(item Item, style lipgloss.Style) string {
 
 			builder.WriteString(style.Render(item.Label()[lastIndex:start]))
 			builder.WriteString(style.
-				Foreground(lipgloss.Color("3")).
+				Foreground(colors.Yellow).
 				Render(item.Label()[start:end]))
 			lastIndex = end
 		}

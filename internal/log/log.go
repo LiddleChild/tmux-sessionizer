@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LiddleChild/tmux-sessionpane/internal/colors"
 	"github.com/LiddleChild/tmux-sessionpane/internal/config"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/davecgh/go-spew/spew"
@@ -62,17 +63,17 @@ func printLogLevel(level LogLevel) string {
 	switch level {
 	case LogLevelDebug:
 		return lipgloss.NewStyle().
-			Foreground(lipgloss.Color("13")).
+			Foreground(colors.BrightMagenta).
 			Render("DEBUG")
 
 	case LogLevelInfo:
 		return lipgloss.NewStyle().
-			Foreground(lipgloss.Color("2")).
+			Foreground(colors.Green).
 			Render("INFO")
 
 	case LogLevelError:
 		return lipgloss.NewStyle().
-			Foreground(lipgloss.Color("1")).Bold(true).
+			Foreground(colors.Red).Bold(true).
 			Render("ERROR")
 
 	default:
