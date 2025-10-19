@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-APP_NAME="tmux-sessionpane"
+APP_NAME="tmux-sessionizer"
 
 BRANCH=$1
 BRANCH="${BRANCH:=main}"
@@ -18,7 +18,7 @@ if ! command -v go &> /dev/null; then
 fi
 
 # clone
-git clone https://github.com/LiddleChild/tmux-sessionpane.git --depth 1 --branch $BRANCH /tmp/$APP_NAME
+git clone https://github.com/LiddleChild/tmux-sessionizer.git --depth 1 --branch $BRANCH /tmp/$APP_NAME
 
 # build and put binary in path
 cd /tmp/$APP_NAME; go install

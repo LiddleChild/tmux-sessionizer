@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/LiddleChild/tmux-sessionpane/internal/app"
-	"github.com/LiddleChild/tmux-sessionpane/internal/config"
-	"github.com/LiddleChild/tmux-sessionpane/internal/log"
+	"github.com/LiddleChild/tmux-sessionizer/internal/app"
+	"github.com/LiddleChild/tmux-sessionizer/internal/config"
+	"github.com/LiddleChild/tmux-sessionizer/internal/log"
 	tea "github.com/charmbracelet/bubbletea"
 )
 

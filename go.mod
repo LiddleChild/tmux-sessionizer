@@ -1,4 +1,4 @@
-module github.com/LiddleChild/tmux-sessionpane
+module github.com/LiddleChild/tmux-sessionizer
 
 go 1.25.0
 

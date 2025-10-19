@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LiddleChild/tmux-sessionpane/internal/colors"
-	"github.com/LiddleChild/tmux-sessionpane/internal/config"
+	"github.com/LiddleChild/tmux-sessionizer/internal/colors"
+	"github.com/LiddleChild/tmux-sessionizer/internal/config"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/davecgh/go-spew/spew"
 )

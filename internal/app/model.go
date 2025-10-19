@@ -3,10 +3,10 @@ package app
 import (
 	"fmt"
 
-	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
-	"github.com/LiddleChild/tmux-sessionpane/internal/config"
-	"github.com/LiddleChild/tmux-sessionpane/internal/log"
-	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
+	"github.com/LiddleChild/tmux-sessionizer/internal/components/superlist"
+	"github.com/LiddleChild/tmux-sessionizer/internal/config"
+	"github.com/LiddleChild/tmux-sessionizer/internal/log"
+	"github.com/LiddleChild/tmux-sessionizer/internal/tmux"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"

@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	AppName    = "tmux-sessionpane"
+	AppName    = "tmux-sessionizer"
 	AppVersion = "v0.2.2"
 )
 

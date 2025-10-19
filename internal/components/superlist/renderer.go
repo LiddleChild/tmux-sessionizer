@@ -3,8 +3,8 @@ package superlist
 import (
 	"strings"
 
-	"github.com/LiddleChild/tmux-sessionpane/internal/colors"
-	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
+	"github.com/LiddleChild/tmux-sessionizer/internal/colors"
+	"github.com/LiddleChild/tmux-sessionizer/internal/utils"
 	"github.com/charmbracelet/lipgloss"
 )
 

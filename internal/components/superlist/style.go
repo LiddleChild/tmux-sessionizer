@@ -1,7 +1,7 @@
 package superlist
 
 import (
-	"github.com/LiddleChild/tmux-sessionpane/internal/colors"
+	"github.com/LiddleChild/tmux-sessionizer/internal/colors"
 	"github.com/charmbracelet/lipgloss"
 )
 

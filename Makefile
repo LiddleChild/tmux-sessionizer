@@ -3,4 +3,4 @@ install:
 	go install
 
 debug:
-	tail -f ~/.config/tmux-sessionpane/debug.log
+	tail -f ~/.config/tmux-sessionizer/debug.log

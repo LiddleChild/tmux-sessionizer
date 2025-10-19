@@ -4,7 +4,7 @@ import (
 	"iter"
 	"math"
 
-	"github.com/LiddleChild/tmux-sessionpane/internal/fuzzyfinder"
+	"github.com/LiddleChild/tmux-sessionizer/internal/fuzzyfinder"
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"

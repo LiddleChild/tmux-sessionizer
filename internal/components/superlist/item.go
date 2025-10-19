@@ -1,7 +1,7 @@
 package superlist
 
 import (
-	"github.com/LiddleChild/tmux-sessionpane/internal/fuzzyfinder"
+	"github.com/LiddleChild/tmux-sessionizer/internal/fuzzyfinder"
 	"github.com/charmbracelet/lipgloss"
 )
 

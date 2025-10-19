@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
-	"github.com/LiddleChild/tmux-sessionpane/internal/config"
+	"github.com/LiddleChild/tmux-sessionizer/internal/components/superlist"
+	"github.com/LiddleChild/tmux-sessionizer/internal/config"
 	"github.com/charmbracelet/lipgloss"
 )
 

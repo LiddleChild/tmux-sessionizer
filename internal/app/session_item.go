@@ -3,8 +3,8 @@ package app
 import (
 	"fmt"
 
-	"github.com/LiddleChild/tmux-sessionpane/internal/components/superlist"
-	"github.com/LiddleChild/tmux-sessionpane/internal/tmux"
+	"github.com/LiddleChild/tmux-sessionizer/internal/components/superlist"
+	"github.com/LiddleChild/tmux-sessionizer/internal/tmux"
 	"github.com/charmbracelet/lipgloss"
 )
 

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
+	"github.com/LiddleChild/tmux-sessionizer/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 )
