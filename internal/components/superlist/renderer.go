@@ -1,6 +1,8 @@
 package superlist
 
 import (
+	"strings"
+
 	"github.com/LiddleChild/tmux-sessionpane/internal/utils"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -21,6 +23,36 @@ type previewInfo struct {
 
 func (m Model) renderFilter() string {
 	return m.filter.View()
+}
+
+func (m Model) renderItem(item Item, style lipgloss.Style) string {
+	switch item := item.(type) {
+	case *filteredItem:
+		var (
+			builder   strings.Builder
+			lastIndex int
+		)
+
+		for _, match := range item.matches {
+			var (
+				start = match.X
+				end   = match.Y + 1
+			)
+
+			builder.WriteString(style.Render(item.Label()[lastIndex:start]))
+			builder.WriteString(style.
+				Foreground(lipgloss.Color("3")).
+				Render(item.Label()[start:end]))
+			lastIndex = end
+		}
+
+		builder.WriteString(style.Render(item.Label()[lastIndex:]))
+
+		return builder.String()
+
+	default:
+		return item.Label()
+	}
 }
 
 // TODO: find a way to refactor previewList() and render()

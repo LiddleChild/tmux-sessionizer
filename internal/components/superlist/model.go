@@ -3,7 +3,6 @@ package superlist
 import (
 	"iter"
 	"slices"
-	"strings"
 
 	"github.com/LiddleChild/tmux-sessionpane/internal/fuzzyfinder"
 	"github.com/charmbracelet/bubbles/cursor"
@@ -192,36 +191,6 @@ func (m Model) GetItemIter() iter.Seq2[int, Item] {
 func (m *Model) SetItems(items []ItemGroup) {
 	m.groups = items
 	m.filterItems(m.filter.Value())
-}
-
-func (m Model) renderItem(item Item, style lipgloss.Style) string {
-	switch item := item.(type) {
-	case *filteredItem:
-		var (
-			builder   strings.Builder
-			lastIndex int
-		)
-
-		for _, match := range item.matches {
-			var (
-				start = match.X
-				end   = match.Y + 1
-			)
-
-			builder.WriteString(style.Render(item.Label()[lastIndex:start]))
-			builder.WriteString(style.
-				Foreground(lipgloss.Color("3")).
-				Render(item.Label()[start:end]))
-			lastIndex = end
-		}
-
-		builder.WriteString(style.Render(item.Label()[lastIndex:]))
-
-		return builder.String()
-
-	default:
-		return item.Label()
-	}
 }
 
 func (m *Model) filterItems(filter string) {
