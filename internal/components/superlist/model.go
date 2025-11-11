@@ -292,9 +292,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				return m, nil
 			}
 
+			var (
+				oldValue = item.Value()
+				newValue = m.input.Value()
+			)
+
 			m.FocusComponent(FocusedComponentFilter)
-			item.SetValue(m.input.Value())
-			return m, SubmitCmd(item.Value(), m.input.Value())
+			item.SetValue(newValue)
+			return m, SubmitCmd(oldValue, newValue)
 
 		case m.FocusedComponent() == FocusedComponentItem && key.Matches(msg, m.keyMap.Cancel):
 			m.FocusComponent(FocusedComponentFilter)
