@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/LiddleChild/tmux-sessionizer/internal/components/superlist"
 	"github.com/LiddleChild/tmux-sessionizer/internal/config"
@@ -61,6 +62,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Dump(log.LogLevelDebug, msg)
 
 	switch msg := msg.(type) {
+	case ErrMsg:
+		log.Println(log.LogLevelError, strings.TrimSpace(msg.Error()))
+
 	case tea.WindowSizeMsg:
 		helpHeight := lipgloss.Height(m.renderTopBar())
 
