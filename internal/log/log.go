@@ -34,17 +34,19 @@ const (
 )
 
 var (
-	DebugFlag = flag.Bool("debug", false, "debug")
+	DebugFlag bool
 
 	logLevel LogLevel
 	entry    *os.File
 )
 
 func Init() error {
+	flag.BoolVar(&DebugFlag, "debug", false, "debug")
+
 	flag.Parse()
 
 	var err error
-	if *DebugFlag {
+	if DebugFlag {
 		entry, err = os.OpenFile(DebugEntryPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 		logLevel = LogLevelDebug
 	} else {
@@ -82,10 +84,6 @@ func printLogLevel(level LogLevel) string {
 }
 
 func print(level LogLevel, s ...string) {
-	if !*DebugFlag {
-		return
-	}
-
 	if level >= logLevel {
 		fmt.Fprint(entry, strings.Join(s, " "))
 	}
@@ -93,7 +91,9 @@ func print(level LogLevel, s ...string) {
 
 func Println(level LogLevel, s string) {
 	print(
-		logLevel,
+		level,
+		printTimestamp(),
+		printLogLevel(level),
 		s,
 		"\n",
 	)
@@ -101,7 +101,7 @@ func Println(level LogLevel, s string) {
 
 func Printlnf(level LogLevel, format string, a ...any) {
 	print(
-		logLevel,
+		level,
 		printTimestamp(),
 		printLogLevel(level),
 		fmt.Sprintf(format, a...),
@@ -111,7 +111,7 @@ func Printlnf(level LogLevel, format string, a ...any) {
 
 func Dump(level LogLevel, v any) {
 	print(
-		logLevel,
+		level,
 		printTimestamp(),
 		printLogLevel(level),
 		spew.Sdump(v),
