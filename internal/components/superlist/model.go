@@ -138,6 +138,7 @@ func (m *Model) ScrollDown(amount int) {
 	m.yOffset += amount
 }
 
+// GetSelectedItem returns superlist.Item or nil when the list is empty
 func (m Model) GetSelectedItem() Item {
 	var (
 		groups   = m.filteredGroups
@@ -145,9 +146,13 @@ func (m Model) GetSelectedItem() Item {
 		idx      = m.cursor
 	)
 
-	for idx >= len(groups[groupIdx].Items) {
+	for groupIdx < len(groups) && idx >= len(groups[groupIdx].Items) {
 		idx -= len(groups[groupIdx].Items)
 		groupIdx += 1
+	}
+
+	if idx >= m.Length() {
+		return nil
 	}
 
 	switch item := groups[groupIdx].Items[idx].(type) {
@@ -277,10 +282,17 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.updateScroll()
 
 		case m.FocusedComponent() == FocusedComponentItem && key.Matches(msg, m.keyMap.Submit):
+			var (
+				item InputItem
+				ok   bool
+			)
+
+			// check for nil
+			if item, ok = m.GetSelectedItem().(InputItem); !ok {
+				return m, nil
+			}
+
 			m.FocusComponent(FocusedComponentFilter)
-
-			item := m.GetSelectedItem().(InputItem)
-
 			item.SetValue(m.input.Value())
 			return m, SubmitCmd(item.Value(), m.input.Value())
 
@@ -288,6 +300,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.FocusComponent(FocusedComponentFilter)
 
 		case m.FocusedComponent() == FocusedComponentFilter && key.Matches(msg, m.keyMap.FocusItem):
+			if m.GetSelectedItem() == nil {
+				return m, nil
+			}
+
 			return m, m.FocusComponent(FocusedComponentItem)
 		}
 	}
@@ -312,6 +328,10 @@ func (m Model) View() string {
 
 	previewInfo := m.previewList()
 	lines = lines[previewInfo.TopBound:min(len(lines), previewInfo.BottomBound+1)]
+
+	if len(lines) == 0 {
+		lines = []string{noResultStyle.Width(m.width).Render("No item found")}
+	}
 
 	style := lipgloss.NewStyle().
 		Height(m.height).

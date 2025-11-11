@@ -18,4 +18,9 @@ var (
 	filterPromptStyle = lipgloss.NewStyle().
 				Foreground(colors.BrightBlack).
 				Bold(true)
+
+	noResultStyle = lipgloss.NewStyle().
+			Italic(true).
+			Foreground(colors.BrightBlack).
+			AlignHorizontal(lipgloss.Center)
 )

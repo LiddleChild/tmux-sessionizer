@@ -104,11 +104,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					execProcessCmd,
 					tea.Quit,
 				)
+
+			default:
+				return m, nil
 			}
 
 		case m.superlist.FocusedComponent() == superlist.FocusedComponentFilter && key.Matches(msg, keyMap.Delete):
 			item := m.superlist.GetSelectedItem()
-
 			if session, ok := item.(*sessionItem); ok {
 				if session.IsAttached {
 					return m, nil
