@@ -15,6 +15,10 @@ func (item filteredItem) Label() string {
 	return item.item.Label()
 }
 
+func (item filteredItem) Suffix() string {
+	return ""
+}
+
 func (item filteredItem) Style(style lipgloss.Style) lipgloss.Style {
 	return style
 }

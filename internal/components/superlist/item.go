@@ -14,6 +14,7 @@ type InputItem interface {
 
 type Item interface {
 	Label() string
+	Suffix() string
 	Style(lipgloss.Style) lipgloss.Style
 }
 

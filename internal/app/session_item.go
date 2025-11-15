@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/LiddleChild/tmux-sessionizer/internal/components/superlist"
 	"github.com/LiddleChild/tmux-sessionizer/internal/tmux"
 	"github.com/charmbracelet/lipgloss"
@@ -13,12 +11,15 @@ var _ superlist.InputItem = (*sessionItem)(nil)
 type sessionItem tmux.Session
 
 func (i sessionItem) Label() string {
-	name := i.Name
+	return i.Name
+}
+
+func (i sessionItem) Suffix() string {
 	if i.IsAttached {
-		name = fmt.Sprintf("%s (attached)", name)
+		return "(attached)"
 	}
 
-	return name
+	return ""
 }
 
 func (i sessionItem) Style(style lipgloss.Style) lipgloss.Style {

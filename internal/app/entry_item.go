@@ -14,6 +14,10 @@ func (i entryItem) Label() string {
 	return string(i.Path)
 }
 
+func (i entryItem) Suffix() string {
+	return ""
+}
+
 func (i entryItem) Style(style lipgloss.Style) lipgloss.Style {
 	return style
 }

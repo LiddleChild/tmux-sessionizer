@@ -27,6 +27,8 @@ func (m Model) renderFilter() string {
 }
 
 func (m Model) renderItem(item Item, style lipgloss.Style) string {
+	var styledLabel string
+
 	switch item := item.(type) {
 	case *filteredItem:
 		var (
@@ -46,11 +48,13 @@ func (m Model) renderItem(item Item, style lipgloss.Style) string {
 			}
 		}
 
-		return builder.String()
+		styledLabel = builder.String()
 
 	default:
-		return item.Label()
+		styledLabel = item.Label()
 	}
+
+	return utils.JoinNonEmpty(styledLabel, item.Suffix())
 }
 
 // TODO: find a way to refactor previewList() and render()
