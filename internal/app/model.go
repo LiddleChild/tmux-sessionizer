@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -131,8 +132,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case ListTmuxSessionMsg:
-		sessions, err := tmux.ListSession()
-		if err != nil {
+		sessions, err := tmux.ListSessions()
+		if errors.Is(err, tmux.NoServerRunningErr) {
+			sessions = []tmux.Session{}
+		} else if err != nil {
 			return m, tea.Sequence(ErrCmd(err), tea.Quit)
 		}
 

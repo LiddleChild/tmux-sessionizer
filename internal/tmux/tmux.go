@@ -4,11 +4,15 @@ package tmux
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"slices"
+	"strings"
 	"time"
+
+	"github.com/LiddleChild/tmux-sessionizer/internal/log"
 )
 
 type session struct {
@@ -17,22 +21,31 @@ type session struct {
 	IsAttached int    `json:"is_attached"`
 }
 
+var (
+	NoServerRunningErr = errors.New("no server running")
+)
+
 func InTmux() bool {
 	return os.Getenv("TMUX") != ""
 }
 
-func ListSession() ([]Session, error) {
-	bs, err := exec.Command(
+func ListSessions() ([]Session, error) {
+	cmd := exec.Command(
 		"tmux",
 		"list-sessions",
 		"-F",
 		`{ "name": "#{session_name}", "created_at": #{session_created}, "is_attached": #{session_attached} }`,
-	).Output()
+	)
+
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
+
+	bs, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, parseError(err, stderr.String())
 	}
 
-	decoder := json.NewDecoder(bytes.NewBuffer(bs))
+	decoder := json.NewDecoder(bytes.NewReader(bs))
 
 	sessions := make([]Session, 0)
 	for decoder.More() {
@@ -66,11 +79,11 @@ func AttachSessionCommand(name string) *exec.Cmd {
 func RenameSession(name, newName string) error {
 	cmd := exec.Command("tmux", "rename-session", "-t", name, newName)
 
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%w: %s", err, stderr.String())
+		return parseError(err, stderr.String())
 	}
 
 	return nil
@@ -79,11 +92,11 @@ func RenameSession(name, newName string) error {
 func DeleteSession(name string) error {
 	cmd := exec.Command("tmux", "kill-session", "-t", name)
 
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%w: %s", err, stderr.String())
+		return parseError(err, stderr.String())
 	}
 
 	return nil
@@ -92,10 +105,11 @@ func DeleteSession(name string) error {
 func HasSession(name string) bool {
 	cmd := exec.Command("tmux", "has-session", "-t", name)
 
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
+		log.Printlnf(log.LogLevelError, "%s", parseError(err, stderr.String()).Error())
 		return false
 	}
 
@@ -105,12 +119,20 @@ func HasSession(name string) bool {
 func NewDetachedSession(name, workDir string) error {
 	cmd := exec.Command("tmux", "new-session", "-d", "-s", name, "-c", workDir)
 
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
-		return err
+		return parseError(err, stderr.String())
 	}
 
 	return nil
+}
+
+func parseError(err error, stderr string) error {
+	if strings.Contains(stderr, "no server running") {
+		return fmt.Errorf("%w: %w", err, NoServerRunningErr)
+	}
+
+	return fmt.Errorf("%w: %s", err, stderr)
 }
