@@ -29,6 +29,19 @@ func InTmux() bool {
 	return os.Getenv("TMUX") != ""
 }
 
+func StartServer() error {
+	cmd := exec.Command("tmux", "start-server")
+
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
+
+	if err := cmd.Run(); err != nil {
+		return parseError(err, stderr.String())
+	}
+
+	return nil
+}
+
 func ListSessions() ([]Session, error) {
 	cmd := exec.Command(
 		"tmux",

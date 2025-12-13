@@ -56,6 +56,10 @@ func (m Model) renderTopBar() string {
 }
 
 func (m Model) Init() tea.Cmd {
+	if err := tmux.StartServer(); err != nil {
+		return ErrCmd(err)
+	}
+
 	return tea.Sequence(ListTmuxSessionCmd, SelectAttachedSessionCmd)
 }
 
