@@ -216,7 +216,7 @@ func (m *Model) filterItems(pattern string) {
 	)
 
 	for _, group := range m.groups {
-		matches := m.fuzzyfinder.Find(group, pattern)
+		matches := m.fuzzyfinder.Match(group, pattern)
 
 		items := make([]Item, 0, len(matches))
 		for _, match := range matches {

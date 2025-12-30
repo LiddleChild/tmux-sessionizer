@@ -36,7 +36,7 @@ func NewForrestTheWoods() Algorithm {
 	}
 }
 
-func (a *ForrestTheWoods) Find(src Source, pattern string) []Match {
+func (a *ForrestTheWoods) Match(src Source, pattern string) []Match {
 	if len(pattern) == 0 {
 		return []Match{}
 	}

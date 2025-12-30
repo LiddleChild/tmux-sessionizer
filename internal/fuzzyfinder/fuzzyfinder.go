@@ -12,5 +12,5 @@ type Match struct {
 }
 
 type Algorithm interface {
-	Find(Source, string) []Match
+	Match(Source, string) []Match
 }

@@ -28,7 +28,7 @@ func NewSmithWaterman() Algorithm {
 	}
 }
 
-func (sw *SmithWaterman) Find(src Source, pattern string) []Match {
+func (sw *SmithWaterman) Match(src Source, pattern string) []Match {
 	scoredItems := make([]scoredItem, 0, src.Len())
 	for i := 0; i < src.Len(); i += 1 {
 		score, indices := sw.score(src.Get(i), pattern)
