@@ -122,7 +122,7 @@ func HasSession(name string) bool {
 	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
-		log.Printlnf(log.LogLevelError, "%s", parseError(err, stderr.String()).Error())
+		log.Error().Msg(strings.TrimSpace(parseError(err, stderr.String()).Error()))
 		return false
 	}
 

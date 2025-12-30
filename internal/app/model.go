@@ -64,11 +64,11 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Dump(log.LogLevelDebug, msg)
+	log.Debug().Dump(msg)
 
 	switch msg := msg.(type) {
 	case ErrMsg:
-		log.Println(log.LogLevelError, strings.TrimSpace(msg.Error()))
+		log.Error().Msg(strings.TrimSpace(msg.Error()))
 
 	case tea.WindowSizeMsg:
 		helpHeight := lipgloss.Height(m.renderTopBar())

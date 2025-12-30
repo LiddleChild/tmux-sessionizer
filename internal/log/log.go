@@ -33,6 +33,10 @@ const (
 	LogLevelError
 )
 
+type LogBuilder struct {
+	Level LogLevel
+}
+
 var (
 	DebugFlag bool
 
@@ -55,6 +59,43 @@ func Init() error {
 	}
 
 	return err
+}
+
+func Info() LogBuilder {
+	return LogBuilder{
+		Level: LogLevelInfo,
+	}
+}
+
+func Error() LogBuilder {
+	return LogBuilder{
+		Level: LogLevelError,
+	}
+}
+
+func Debug() LogBuilder {
+	return LogBuilder{
+		Level: LogLevelDebug,
+	}
+}
+
+func (b LogBuilder) Dump(v any) {
+	print(
+		b.Level,
+		printTimestamp(),
+		printLogLevel(b.Level),
+		spew.Sdump(v),
+	)
+}
+
+func (b LogBuilder) Msg(s string) {
+	print(
+		b.Level,
+		printTimestamp(),
+		printLogLevel(b.Level),
+		s,
+		"\n",
+	)
 }
 
 func printTimestamp() string {
@@ -87,33 +128,4 @@ func print(level LogLevel, s ...string) {
 	if level >= logLevel {
 		fmt.Fprint(entry, strings.Join(s, " "))
 	}
-}
-
-func Println(level LogLevel, s string) {
-	print(
-		level,
-		printTimestamp(),
-		printLogLevel(level),
-		s,
-		"\n",
-	)
-}
-
-func Printlnf(level LogLevel, format string, a ...any) {
-	print(
-		level,
-		printTimestamp(),
-		printLogLevel(level),
-		fmt.Sprintf(format, a...),
-		"\n",
-	)
-}
-
-func Dump(level LogLevel, v any) {
-	print(
-		level,
-		printTimestamp(),
-		printLogLevel(level),
-		spew.Sdump(v),
-	)
 }
