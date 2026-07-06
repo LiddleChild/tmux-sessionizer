@@ -83,9 +83,9 @@ func ListSessions() ([]Session, error) {
 
 func AttachSessionCommand(name string) *exec.Cmd {
 	if !InTmux() {
-		return exec.Command("tmux", "attach-session", "-t", name)
+		return exec.Command("tmux", "attach-session", "-t", exactSessionName(name))
 	} else {
-		return exec.Command("tmux", "switch-client", "-t", name)
+		return exec.Command("tmux", "switch-client", "-t", exactSessionName(name))
 	}
 }
 
@@ -116,7 +116,7 @@ func DeleteSession(name string) error {
 }
 
 func HasSession(name string) bool {
-	cmd := exec.Command("tmux", "has-session", "-t", name)
+	cmd := exec.Command("tmux", "has-session", "-t", exactSessionName(name))
 
 	stderr := new(bytes.Buffer)
 	cmd.Stderr = stderr
@@ -148,4 +148,8 @@ func parseError(err error, stderr string) error {
 	}
 
 	return fmt.Errorf("%w: %s", err, stderr)
+}
+
+func exactSessionName(s string) string {
+	return fmt.Sprintf("=%s", s)
 }
