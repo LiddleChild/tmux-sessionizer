@@ -24,7 +24,7 @@ var (
 	WorkspaceEntries = make([]WorkspaceEntry, 0)
 )
 
-func Init() error {
+func Initialize() error {
 	_, err := os.Stat(BaseConfigPath)
 	switch {
 	case err != nil && errors.Is(err, os.ErrNotExist):
@@ -70,6 +70,10 @@ func readWorkspaceEntries() ([]WorkspaceEntry, error) {
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return workspaceEntries, err
+		}
+
 		workspaceBasePath := absolutePath(scanner.Text())
 		entries, err := os.ReadDir(workspaceBasePath)
 		if err != nil {
@@ -104,6 +108,10 @@ func readSingleEntries() ([]WorkspaceEntry, error) {
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return singleEntries, err
+		}
+
 		entryPath := absolutePath(scanner.Text())
 		singleEntries = append(singleEntries, WorkspaceEntry{
 			Name: strings.ReplaceAll(filepath.Base(entryPath), ".", "_"),

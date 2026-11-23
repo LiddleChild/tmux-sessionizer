@@ -5,6 +5,7 @@ import (
 
 	"github.com/LiddleChild/tmux-sessionizer/internal/app"
 	"github.com/LiddleChild/tmux-sessionizer/internal/config"
+	"github.com/LiddleChild/tmux-sessionizer/internal/flag"
 	"github.com/LiddleChild/tmux-sessionizer/internal/log"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -16,11 +17,16 @@ func main() {
 }
 
 func run() error {
-	if err := config.Init(); err != nil {
+	if flag.VersionFlag {
+		fmt.Printf("%s %s\n", config.AppName, config.AppVersion)
+		return nil
+	}
+
+	if err := config.Initialize(); err != nil {
 		return fmt.Errorf("failed to initialize: %w", err)
 	}
 
-	if err := log.Init(); err != nil {
+	if err := log.Initialize(flag.DebugFlag); err != nil {
 		return fmt.Errorf("failed to initialize logger: %w", err)
 	}
 

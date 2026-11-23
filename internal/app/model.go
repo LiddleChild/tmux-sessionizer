@@ -2,7 +2,6 @@ package app
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/LiddleChild/tmux-sessionizer/internal/components/superlist"
@@ -48,11 +47,8 @@ func (m Model) renderTopBar() string {
 	}
 
 	return lipgloss.NewStyle().
-		Height(4).
-		Render(lipgloss.JoinVertical(lipgloss.Top,
-			fmt.Sprintf("%s %s", config.AppName, config.AppVersion),
-			help,
-		))
+		Height(3).
+		Render(help)
 }
 
 func (m Model) Init() tea.Cmd {

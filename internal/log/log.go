@@ -2,7 +2,6 @@
 package log
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -38,19 +37,13 @@ type LogBuilder struct {
 }
 
 var (
-	DebugFlag bool
-
 	logLevel LogLevel
 	entry    *os.File
 )
 
-func Init() error {
-	flag.BoolVar(&DebugFlag, "debug", false, "debug")
-
-	flag.Parse()
-
+func Initialize(debug bool) error {
 	var err error
-	if DebugFlag {
+	if debug {
 		entry, err = os.OpenFile(DebugEntryPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 		logLevel = LogLevelDebug
 	} else {
