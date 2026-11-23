@@ -6,10 +6,6 @@ import (
 )
 
 var (
-	groupNameStyle = lipgloss.NewStyle().
-			Italic(true).
-			Foreground(colors.BrightBlack)
-
 	hoveredItemStyle = lipgloss.NewStyle().
 				Foreground(colors.Cyan).
 				Background(colors.BrightBlack).

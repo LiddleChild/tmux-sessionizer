@@ -99,8 +99,6 @@ func (m Model) renderList() []string {
 			continue
 		}
 
-		lines = append(lines, groupNameStyle.Render(g.Name))
-
 		for _, i := range g.Items {
 			var (
 				style      lipgloss.Style
